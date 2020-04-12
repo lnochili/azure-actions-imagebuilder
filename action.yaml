@@ -1,0 +1,32 @@
+on: push
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    # checkout the repo
+    - name: 'Checkout Github Action' 
+      uses: actions/checkout@master
+    - name: 'Run Azure image builder'
+      uses: azure/imageBuildery@v0
+      with: 
+        subscriptionID: "xxxxxx"
+        ResourceGroupName: "distributorRG"
+        imageType: PlatformImage
+        imagebuilderTemplateName: ubuntu1804  ### Standard templates will be part of this action repository####
+        buildTimeoutInMinutes: 80 
+        #####List of Customizer values, comma separated#########
+        customizer-type: [ "shell", "shell-inline"]
+        customizer-name: [ "runCustomScript", "setupBuildPath"]
+        #############List of source script or inline commands #############
+        customizer-source: 
+                  ["https://raw.githubusercontent.com/lnochili/learn-git/master/aib-shellscript.sh",
+                    "sudo mkdir /buildArtifacts; sudo cp /tmp/index.html /buildArtifacts/index.html;" ]
+        ############List of customizer destination on the image########
+        customizer-destination: ["/tmp/aib-hostnameScript.sh"]
+
+        ########Distributor details #############
+        distributor-type: ManagedImage
+        distributor-imagedef: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>
+        distributor-location: "West US2"
+        distributor-runOutputName: imageDefName.${BuildID}  #### this ID needs to be Unique
+        distributor-artifactTags: "UbuntuServer 18.04LTS"
