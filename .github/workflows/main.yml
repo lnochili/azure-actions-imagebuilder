@@ -37,7 +37,7 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
              
         - name: azure Image builder prerequisites 
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
               creds: ${{ secrets.AZURE_CREDENTIALS }}  
             ######Source image details########### 
