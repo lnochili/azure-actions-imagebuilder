@@ -3,3 +3,4 @@
 echo "Hello world"
 
 mkdir ./tmp
+mkdir /tmp
