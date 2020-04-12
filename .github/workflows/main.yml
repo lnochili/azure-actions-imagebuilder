@@ -39,7 +39,7 @@ jobs:
         - name: azure Image builder prerequisites 
           uses: azure/CLI@v1
           with:
-              creds: ${{secrets.AZURE_CREDENTIALS}}  
+              creds: ${{ secrets.AZURE_CREDENTIALS }}  
             ######Source image details########### 
               type: "PlatformImage"
               publisher: "Canonical"
@@ -70,7 +70,7 @@ jobs:
         - name: Create azure Image builder template   
           uses: azure/CLI@v1
           with:
-            creds: ${{secrets.AZURE_CREDENTIALS}}                          
+            creds: ${{ secrets.AZURE_CREDENTIALS }}                          
             inlineScript: |
               ###Create Image Template Resource###
                 az resource create  --resource-group ${{env.distributor_resource_group}}  \ 
@@ -79,7 +79,7 @@ jobs:
         - name: Add Customizers to azure Image builder template
           uses: azure/CLI@v1
           with:
-            creds: ${{secrets.AZURE_CREDENTIALS}}   
+            creds: ${{ secrets.AZURE_CREDENTIALS }}   
             customizer.type: "shell"
             customizer.name: "RunScriptFromSource"
             customizer.scriptUri: "https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/.github/workflows/customizerscript.sh"
@@ -94,7 +94,7 @@ jobs:
         - name: Run azure Image builder template
           uses: azure/cli@v1
           with:   
-            creds: ${{secrets.AZURE_CREDENTIALS}}                       
+            creds: ${{ secrets.AZURE_CREDENTIALS }}                       
             inlineScript: |
               #### Run Image Template Resource ###
                 az resource invoke-action  --resource-group ${{env.distributor_resource_group}}  \
