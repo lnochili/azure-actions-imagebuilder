@@ -82,7 +82,7 @@ jobs:
             creds: ${{secrets.AZURE_CREDS}}   
             customizer.type: "shell"
             customizer.name: "RunScriptFromSource"
-            customizer.scriptUri: "https://raw.githubusercontent.com/raiyanalam/azureImageBuilderAction/master/PlatformImageTemplate-UbuntuLinuxCanonical.json"
+            customizer.scriptUri: "https://raw.githubusercontent.com/lnochili/azure-action-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json"
             inlineScript: |
               ###Update Image template with customizers###
               az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} \ 
