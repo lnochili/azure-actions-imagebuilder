@@ -37,7 +37,7 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
              
         - name: azure Image builder prerequisites 
-          uses: azure/cli
+          uses: azure/cli@v1
           with:
               creds: ${{ secrets.AZURE_CREDENTIALS }}  
             ######Source image details########### 
@@ -68,7 +68,7 @@ jobs:
             
         #### Azure Image builder actions ####              
         - name: Create azure Image builder template   
-          uses: azure/CLI@v1
+          uses: azure/cli@v1
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}                          
             inlineScript: |
@@ -77,7 +77,7 @@ jobs:
                     --properties @$GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json \
                       --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}}
         - name: Add Customizers to azure Image builder template
-          uses: azure/CLI@v1
+          uses: azure/cli@v1
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}   
             customizer.type: "shell"
