@@ -35,7 +35,6 @@ jobs:
       - name: azure Image builder prerequisites
         uses: azure/cli@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  
           type: "PlatformImage"
           publisher: "Canonical"
           offer: "UbuntuServer"
@@ -43,16 +42,17 @@ jobs:
           version: "latest"    
           os_type: "Linux"
           inlineScript: |
-            az account show
+            mkdir $GITHUB_WORKSPACE/aib_local
+            az account show --query id > $GITHUB_WORKSPACE/aib_local/subscriptionId.out
             az group create -n $env.distributor_resource_group -l $env.image_location --debug
             az sig create -g $env.distributor_resource_group  --gallery-name $env.image_gallery_name --debug
             az sig image-definition create -g $env.distributor_resource_group --gallery-name $env.image_gallery_name --gallery-image-definition $env.image_definiation --publisher $publisher --offer $offer  --sku $sku  --os-type $os_type --debug
             
       - name: Update AIB standard template with inputs
         run: |
-          mkdir $GITHUB_WORKSPACE/aib_local
+          subscriptionId=`echo $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
           curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./aib_local/PlatformImageTemplate-UbuntuLinuxCanonical.json
-          sed -i -e "s/<subscriptionID>/${{secrets.AZURE_CREDENTIALS.subscriptionId}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
+          sed -i -e "s/<subscriptionID>/$subscriptionId/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
           sed -i -e "s/<rgName>/${{env.distributor_resource_group}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
           sed -i -e "s/<region>/${{env.image_location}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
           sed -i -e "s/<imageName>/${{env.image_definition}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
@@ -62,14 +62,12 @@ jobs:
       - name: Create azure Image builder template   
         uses: azure/cli@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}                          
           inlineScript: |
             az resource create  --resource-group ${{env.distributor_resource_group}} --properties @$GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}}
       
       - name: Add Customizers to azure Image builder template
         uses: azure/cli@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}   
           customizer.type: "shell"
           customizer.name: "RunScriptFromSource"
           customizer.scriptUri: "https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/.github/workflows/customizerscript.sh"
