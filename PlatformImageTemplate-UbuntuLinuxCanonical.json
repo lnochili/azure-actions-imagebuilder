@@ -34,6 +34,8 @@
                         "baseosimg": "ubuntu1804",
                         "userTags": "<artfactTags>"
                     }
+                },
+                {
                 }
             ]
         }
