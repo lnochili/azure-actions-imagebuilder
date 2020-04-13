@@ -24,9 +24,9 @@ jobs:
       sku: "18.04-LTS"
       version: "latest"    
       os_type: "Linux"
-      customizer.type: "shell"
-      customizer.name: "RunScriptFromSource"
-      customizer.scriptUri: "https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/.github/workflows/customizerscript.sh"
+      customizer_type: "shell"
+      customizer_name: "RunScriptFromSource"
+      customizer_scriptUri: "https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/.github/workflows/customizerscript.sh"
 
     steps:
       - name: 'Checkout Github Action'
@@ -73,7 +73,7 @@ jobs:
         uses: azure/cli@v1
         with:
           inlineScript: |
-            az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }} --scripts ${{ env.customizer.scriptUri }}  --customizer-name ${{ env.customizer.name}} --type ${{ env.customiser.type }}
+            az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }} --scripts ${{ env.customizer_scriptUri }}  --customizer-name ${{ env.customizer_name}} --type ${{ env.customiser_type }}
             az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }} --inline-script "sudo mkdir /buildArtifacts" \"sudo cp /tmp/index.html /buildArtifacts/index.html" --customizer-name shell-script-inline  
       - name: Run azure Image builder template
         uses: azure/cli@v1
