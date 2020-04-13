@@ -13,20 +13,16 @@ jobs:
     env:
       image_template_name: "UbuntuServer18.04LTS"
       run_output_name: $GITHUB_RUN_NUMBER
-      ######Source image details########### 
       type: "PlatformImage"
       publisher: "Canonical"
       offer": "UbuntuServer"
       sku: "18.04-LTS"
       version: "latest"    
-     ######Target Distribution details###########
       distributor_resource_group: "iblinuxGalleryRG"
       image_gallery_name: "iblinuxGallery"
       image_definition: "iblinux"
       image_version: "0.1"
       image_location: "West US2"
-    ########Custom Scipt location#######
-    
     steps:
       - name: 'Checkout Github Action'
         uses: actions/checkout@master
@@ -47,13 +43,10 @@ jobs:
           version: "latest"    
           os_type: "Linux"
           inlineScript: |
-            az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc --role Contributor \
-                    --scope /subscriptions/$creds.subscriptionId/resourceGroups/$env.distributorResourceGroup --debug
+            az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc --role Contributor --scope /subscriptions/$creds.subscriptionId/resourceGroups/$env.distributorResourceGroup --debug
             az group create -n $env.distributor_resource_group -l $env.image_location --debug
             az sig create -g $env.distributor_resource_group  --gallery-name $env.image_gallery_name --debug
-            az sig image-definition create -g $env.distributor_resource_group --gallery-name $env.image_gallery_name \
-                  --gallery-image-definition $env.image_definiation --publisher $publisher --offer $offer  \
-                      --sku $sku  --os-type $os_type --debug
+            az sig image-definition create -g $env.distributor_resource_group --gallery-name $env.image_gallery_name --gallery-image-definition $env.image_definiation --publisher $publisher --offer $offer  --sku $sku  --os-type $os_type --debug
             
       - name: Update AIB standard template with inputs
         run: |
@@ -83,19 +76,12 @@ jobs:
           customizer.name: "RunScriptFromSource"
           customizer.scriptUri: "https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/.github/workflows/customizerscript.sh"
           inlineScript: |
-            ###Update Image template with customizers###
-            az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} \ 
-                    --scripts $customizer.scriptUri  --customizer-name $customizer.name --type $customiser.type 
-                    
-            az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} \ 
-                    --inline-script "sudo mkdir /buildArtifacts" \"sudo cp /tmp/index.html /buildArtifacts/index.html" \
-                      --customizer-name shell-script-inline  
+            az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} --scripts $customizer.scriptUri  --customizer-name $customizer.name --type $customiser.type 
+            az image builder  customizer add --resource-group ${{env.distributor_resource_group}} -n ${{env.image_template_name}} --inline-script "sudo mkdir /buildArtifacts" \"sudo cp /tmp/index.html /buildArtifacts/index.html" --customizer-name shell-script-inline  
       - name: Run azure Image builder template
         uses: azure/cli@v1
         with:   
           creds: ${{ secrets.AZURE_CREDENTIALS }}                       
           inlineScript: |
             #### Run Image Template Resource ###
-            az resource invoke-action  --resource-group ${{env.distributor_resource_group}}  \
-                      --resource-type  Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}} --action Run
-               
+            az resource invoke-action  --resource-group ${{env.distributor_resource_group}} --resource-type  Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}} --action Run
