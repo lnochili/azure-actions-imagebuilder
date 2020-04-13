@@ -56,12 +56,14 @@ jobs:
             imgLocation=${{ env.image_location }}
             imgDefinition=${{ env.image_definition }}
             runOutputName=${{ env.run_output_name }}
+            userTags= [ ${{ env.version }},${{ env.run_output_name }} ]
             curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<region>/$imgLocation/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<ImageDefName>/$imgDefinition/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<runOutputName>/$runOutputName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<resourceGroupID>/$rgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<artifactTags>/$userTags/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             cat ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             az resource create --resource-group ${{ env.distributor_resource_group }} --properties @./PlatformImageTemplate-UbuntuLinuxCanonical.json --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{ env.image_template_name }}
       
