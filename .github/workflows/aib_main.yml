@@ -47,24 +47,19 @@ jobs:
             az sig create -g ${{ env.distributor_resource_group }}  --gallery-name ${{ env.image_gallery_name }} 
             az sig image-definition create -g ${{ env.distributor_resource_group }} --gallery-name ${{ env.image_gallery_name }} --gallery-image-definition ${{ env.image_definition }} --publisher ${{ env.publisher }} --offer ${{ env.offer }} --sku ${{ env.sku }} --os-type ${{env.os_type }} 
             cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out
-      - name: Update AIB standard template with inputs
-        run: |
-          subscriptionId=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
-          curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          sed -i -e "s/<rgName>/${{ env.distributor_resource_group }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          sed -i -e "s/<region>/${{ env.image_location }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          sed -i -e "s/<imageName>/${{ env.image_definition }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          sed -i -e "s/<runOutputName>/${{ env.run_output_name }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          chmod ugo+r ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-          cp ./PlatformImageTemplate-UbuntuLinuxCanonical.json $GITHUB_WORKSPACE/aib_local
-            
-        #### Azure Image builder actions ####              
       - name: Create azure Image builder template   
         uses: azure/cli@v1
         with:
-          inlineScript: |
-            az resource create  --resource-group ${{ env.distributor_resource_group }} --properties @$GITHUB_WORKSPACE/aib_local/PlatformImageTemplate-UbuntuLinuxCanonical.json --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{ env.image_template_name }}
+          inlineScript: | 
+            subscriptionId=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
+            curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<rgName>/${{ env.distributor_resource_group }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<region>/${{ env.image_location }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<imageName>/${{ env.image_definition }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<runOutputName>/${{ env.run_output_name }}/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            cat ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            az resource create  --resource-group ${{ env.distributor_resource_group }} --properties @./PlatformImageTemplate-UbuntuLinuxCanonical.json --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{ env.image_template_name }}
       
       - name: Add Customizers to azure Image builder template
         uses: azure/cli@v1
