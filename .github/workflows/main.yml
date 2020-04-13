@@ -35,6 +35,14 @@ jobs:
           uses: azure/login@v1
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
+         
+        - name: azure cli testing
+          uses: azure/cli@v1
+          with:
+              creds: ${{ secrets.AZURE_CREDENTIALS }}  
+              inlineScript: |
+                  echo "hello az cli " >> account.txt
+                  cat account.txt
              
         - name: azure Image builder prerequisites 
           uses: azure/cli@v1
