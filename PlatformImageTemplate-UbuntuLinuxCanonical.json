@@ -24,6 +24,7 @@
                 "version": "latest"          
             },
         "distribute": 
+            [
                 {   "type":"ManagedImage",
                     "imageId": "/subscriptions/<subscriptionID>/resourceGroups/<resourceGroupID>/providers/Microsoft.Compute/images/<ImageDefName>",
                     "location": "WestUS2",
@@ -34,5 +35,6 @@
                         "userTags": "<artfactTags>"
                     }
                 }
+            ]
         }
     }
