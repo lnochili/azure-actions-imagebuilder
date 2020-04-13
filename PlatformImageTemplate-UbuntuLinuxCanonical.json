@@ -22,8 +22,7 @@
                 "offer": "UbuntuServer",
                 "sku": "18.04-LTS",
                 "version": "latest"          
-            }
-        ],
+            },
         "distribute": 
             [
                 {   "type":"ManagedImage",
