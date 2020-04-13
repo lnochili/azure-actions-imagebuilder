@@ -53,8 +53,8 @@ jobs:
           inlineScript: | 
             subscriptionId=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
             rgName=${{ env.run_output_name }}
-            imgLocation={{ env.image_location }}
-            imgDefinition={{ env.image_definition }}
+            imgLocation=${{ env.image_location }}
+            imgDefinition=${{ env.image_definition }}
             runOutputName=${{ env.run_output_name }}
             curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
