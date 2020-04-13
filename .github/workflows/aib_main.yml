@@ -44,9 +44,9 @@ jobs:
           inlineScript: |
             mkdir $GITHUB_WORKSPACE/aib_local
             az account show --query id > $GITHUB_WORKSPACE/aib_local/subscriptionId.out
-            az group create -n $env.distributor_resource_group -l $env.image_location --debug
-            az sig create -g $env.distributor_resource_group  --gallery-name $env.image_gallery_name --debug
-            az sig image-definition create -g $env.distributor_resource_group --gallery-name $env.image_gallery_name --gallery-image-definition $env.image_definiation --publisher $publisher --offer $offer  --sku $sku  --os-type $os_type --debug
+            az group create -n ${{ env.distributor_resource_group }} -l ${{ env.image_location }} --debug
+            az sig create -g ${{ env.distributor_resource_group }}  --gallery-name ${{ env.image_gallery_name }} --debug
+            az sig image-definition create -g ${{ env.distributor_resource_group }} --gallery-name ${{ env.image_gallery_name }} --gallery-image-definition ${{ env.image_definiation }} --publisher $publisher --offer $offer  --sku $sku  --os-type $os_type --debug
             
       - name: Update AIB standard template with inputs
         run: |
