@@ -40,7 +40,6 @@ jobs:
         uses: azure/cli@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}  
-            ######Source image details########### 
           type: "PlatformImage"
           publisher: "Canonical"
           offer: "UbuntuServer"
@@ -50,8 +49,8 @@ jobs:
           inlineScript: |
             chmod +x $GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
             $GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
-                         
-      - name: 'Update AIB standard template with inputs'
+            
+      - name: Update AIB standard template with inputs
         run: |
           mkdir $GITHUB_WORKSPACE/aib_local
           curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./aib_local/PlatformImageTemplate-UbuntuLinuxCanonical.json
