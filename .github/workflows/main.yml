@@ -37,9 +37,9 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
          
         - name: azure cli testing
-          uses: azure/cli@v1
+          uses: azure/CLI@v1
           with:
-              creds: ${{ secrets.AZURE_CREDENTIALS }}  
+              azcliversion: 2.0.72
               inlineScript: |
                   echo "hello az cli " >> account.txt
                   cat account.txt
