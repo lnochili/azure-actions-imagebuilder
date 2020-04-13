@@ -18,7 +18,7 @@ jobs:
       image_gallery_name: "iblinuxGallery"
       image_definition: "iblinux"
       image_version: "0.1"
-      image_location: "West US2"
+      image_location: "westus2"
     steps:
       - name: 'Checkout Github Action'
         uses: actions/checkout@master
