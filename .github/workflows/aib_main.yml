@@ -46,10 +46,10 @@ jobs:
             az group create -n ${{ env.distributor_resource_group }} -l ${{ env.image_location }} 
             az sig create -g ${{ env.distributor_resource_group }}  --gallery-name ${{ env.image_gallery_name }} 
             az sig image-definition create -g ${{ env.distributor_resource_group }} --gallery-name ${{ env.image_gallery_name }} --gallery-image-definition ${{ env.image_definition }} --publisher ${{ env.publisher }} --offer ${{ env.offer }} --sku ${{ env.sku }} --os-type ${{env.os_type }} 
-            echo $GITHUB_WORKSPACE/aib_local/subscriptionId.out
+            cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out
       - name: Update AIB standard template with inputs
         run: |
-          subscriptionId=`echo $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
+          subscriptionId=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
           curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./aib_local/PlatformImageTemplate-UbuntuLinuxCanonical.json
           sed -i -e "s/<subscriptionID>/$subscriptionId/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
           sed -i -e "s/<rgName>/${{env.distributor_resource_group}}/g" $GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json
