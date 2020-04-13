@@ -39,23 +39,23 @@ jobs:
         - name: azure cli testing
           uses: azure/CLI@v1
           with:
-              azcliversion: 2.0.72
-              inlineScript: |
-                  echo "hello az cli " >> account.txt
-                  cat account.txt
+            azcliversion: 2.0.72
+            inlineScript: |
+                echo "hello az cli " >> account.txt
+                cat account.txt
              
         - name: azure Image builder prerequisites 
           uses: azure/cli@v1
           with:
-              creds: ${{ secrets.AZURE_CREDENTIALS }}  
+            creds: ${{ secrets.AZURE_CREDENTIALS }}  
             ######Source image details########### 
-              type: "PlatformImage"
-              publisher: "Canonical"
-              offer: "UbuntuServer"
-              sku: "18.04-LTS"
-              version: "latest"    
-              os_type: "Linux"
-              inlineScript: |
+            type: "PlatformImage"
+            publisher: "Canonical"
+            offer: "UbuntuServer"
+            sku: "18.04-LTS"
+            version: "latest"    
+            os_type: "Linux"
+            inlineScript: |
                 echo "ooooooooooooHellolllllll"
                 #chmod +x $GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
                 #$GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
