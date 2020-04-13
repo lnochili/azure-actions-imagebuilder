@@ -48,8 +48,9 @@ jobs:
               version: "latest"    
               os_type: "Linux"
               inlineScript: |
-                chmod +x $GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
-                $GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
+                echo "ooooooooooooHellolllllll"
+                #chmod +x $GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
+                #$GITHUB_WORKSPACE/.github/workflows/prereq-script.sh
                 
                 #az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc --role Contributor \
                 #    --scope /subscriptions/$creds.subscriptionId/resourceGroups/$env.distributorResourceGroup
