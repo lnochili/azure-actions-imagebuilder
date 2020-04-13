@@ -51,7 +51,8 @@ jobs:
         uses: azure/cli@v1
         with:
           inlineScript: | 
-            subscriptionId=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
+            temp=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
+            subscriptionId="${temp#\"}"`
             rgName=${{ env.distributor_resource_group }}
             imgLocation=${{ env.image_location }}
             imgDefinition=${{ env.image_definition }}
