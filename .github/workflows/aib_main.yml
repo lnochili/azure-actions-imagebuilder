@@ -33,7 +33,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: azure Image builder prerequisites
-        uses: azure/cli@v1
+        uses: azure/CLI@v1
         with:
           type: "PlatformImage"
           publisher: "Canonical"
