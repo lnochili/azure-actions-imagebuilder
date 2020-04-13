@@ -43,6 +43,7 @@ jobs:
           version: "latest"    
           os_type: "Linux"
           inlineScript: |
+            az account show
             az role assignment create --assignee cf32a0cc-373c-47c9-9156-0db11f6a6dfc --role Contributor --scope /subscriptions/$creds.subscriptionId/resourceGroups/$env.distributorResourceGroup --debug
             az group create -n $env.distributor_resource_group -l $env.image_location --debug
             az sig create -g $env.distributor_resource_group  --gallery-name $env.image_gallery_name --debug
@@ -64,10 +65,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}                          
           inlineScript: |
-            ###Create Image Template Resource###
-            az resource create  --resource-group ${{env.distributor_resource_group}}  \ 
-                    --properties @$GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json \
-                      --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}}
+            az resource create  --resource-group ${{env.distributor_resource_group}} --properties @$GITHUB_WORKSPACE/aib-local/PlatformImageTemplate-UbuntuLinuxCanonical.json --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{env.image_template_name}}
+      
       - name: Add Customizers to azure Image builder template
         uses: azure/cli@v1
         with:
