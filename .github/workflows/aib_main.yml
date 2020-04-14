@@ -17,7 +17,7 @@ jobs:
       image_gallery_name: "iblinuxGallery"
       image_definition: "UbuntuServer18.04"
       image_name: "UbuntuServer18.04LTS"
-      image_version: 18.04.LTS$GITHUB_RUN_NUMBER
+      image_version: "18.04.01"
       image_location: "westus2"
       publisher: "Canonical"
       offer: "UbuntuServer"
