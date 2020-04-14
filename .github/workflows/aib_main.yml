@@ -75,7 +75,7 @@ jobs:
         with:
           inlineScript: |
             az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }}   --customizer-name ${{ env.customizer_name}} --type ${{ env.customizer_type }} --script-url ${{ env.customizer_scriptUri }} --defer
-            az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }}   --customizer-name "shell-script-inline" --inline-script "cd /var/www/myapp; node server.js&" --defer
+            az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }}   --customizer-name "shell-script-inline" --type {{ env.customizer_type }} --inline-script "cd /var/www/myapp; node server.js&" --defer
       - name: Run azure Image builder template
         uses: azure/cli@v1
         with:   
