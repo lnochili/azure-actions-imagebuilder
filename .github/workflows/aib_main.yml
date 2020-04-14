@@ -11,13 +11,15 @@ jobs:
     name: Azure Image builder run 
     runs-on: ubuntu-latest
     env:
-      image_template_name: "UbuntuServer18.04LTS"
+      image_template_name: "iblinux"
+
       run_output_name: $GITHUB_RUN_NUMBER
       type: "PlatformImage"
       distributor_resource_group: "iblinuxGalleryRG"
       image_gallery_name: "iblinuxGallery"
-      image_definition: "iblinux"
-      image_version: "0.1"
+      image_definition: "UbuntuServer18.04"
+      image_name: "UbuntuServer18.04LTS"
+      image_version: 18.04.$GITHUB_RUN_NUMBER
       image_location: "westus2"
       publisher: "Canonical"
       offer: "UbuntuServer"
@@ -56,13 +58,13 @@ jobs:
             subscriptionId="${temp%\"}"
             rgName=${{ env.distributor_resource_group }}
             imgLocation=${{ env.image_location }}
-            imgDefinition=${{ env.image_definition }}
+            imgName=${{ env.image_name }}
             runOutputName=${{ env.run_output_name }}
             userTags=${{ env.version }}$runOutputName
             curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<region>/$imgLocation/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<ImageDefName>/$imgDefinition/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<ImageName>/$imgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<runOutputName>/$runOutputName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<resourceGroupID>/$rgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<artfactTags>/$userTags/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
@@ -80,7 +82,6 @@ jobs:
         with:   
           creds: ${{ secrets.AZURE_CREDENTIALS }}                       
           inlineScript: |
-            #### Run Image Template Resource ###
-            image_name={{ env.image_template_name }}
+            #### Run Image builder template and create image version ###
             az image builder run --resource-group ${{ env.distributor_resource_group }}  --name ${{ env.image_template_name }} 
-            az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name iblinuxgallery --gallery-image-definition iblinux --gallery-image-version 1.0.2 --managed-image $image_name
+            az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name {{ env.image_gallery_name }} --gallery-image-definition {{ env.image_definition }} --gallery-image-version {{ env.image_version }} --managed-image {{ env.image_name }}
