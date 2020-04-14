@@ -4,7 +4,7 @@
 name: Share data between jobs
 
 on:
-  [push]
+  [ issue, issue_comment ]
 
 jobs:
   job_1:
@@ -67,7 +67,7 @@ jobs:
             sed -i -e "s/<resourceGroupID>/$rgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<artfactTags>/$userTags/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             cat ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-            az resource create --resource-group ${{ env.distributor_resource_group }} --properties @./PlatformImageTemplate-UbuntuLinuxCanonical.json --is-full-object  --resource-type Microsoft.VirtualMachineImages/imageTemplates -n ${{ env.image_template_name }}
+            az image builder create --resource-group ${{ env.distributor_resource_group }} --image-template ./PlatformImageTemplate-UbuntuLinuxCanonical.json --name ${{ env.image_template_name }}
       
       - name: Add Customizers to azure Image builder template
         uses: azure/cli@v1
@@ -81,4 +81,6 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}                       
           inlineScript: |
             #### Run Image Template Resource ###
-            az resource invoke-action  --resource-group ${{ env.distributor_resource_group }} --resource-type  Microsoft.VirtualMachineImages/imageTemplates -n ${{ env.image_template_name }} --action Run
+            image_name={{ env.image_template_name }}
+            az image builder run --resource-group ${{ env.distributor_resource_group }}  --name ${{ env.image_template_name }} 
+            az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name iblinuxgallery --gallery-image-definition iblinux --gallery-image-version 1.0.2 --managed-image $image_name
