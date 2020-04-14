@@ -1,6 +1,5 @@
 #!/usr/bin/sh
 
-echo "Hello world"
-
-mkdir ./tmp
-mkdir /tmp
+mkdir ./temp
+pwd > ./temp/temp.out
+echo "Hello .. custom script from image builder" >> /tmp/temp.out
