@@ -4,7 +4,7 @@
 name: Share data between jobs
 
 on:
-  [ issue, issue_comment ]
+  [ issue_comment ]
 
 jobs:
   job_1:
