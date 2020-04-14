@@ -82,4 +82,4 @@ jobs:
           inlineScript: |
             #### Run Image builder template and create image version ###
             az image builder run --resource-group ${{ env.distributor_resource_group }}  --name ${{ env.image_template_name }} 
-            az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name {{ env.image_gallery_name }} --gallery-image-definition {{ env.image_definition }} --gallery-image-version {{ env.image_version }} --managed-image {{ env.image_name }}
+            az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name ${{ env.image_gallery_name }} --gallery-image-definition ${{ env.image_definition }} --gallery-image-version ${{ env.image_version }} --managed-image ${{ env.image_name }}
