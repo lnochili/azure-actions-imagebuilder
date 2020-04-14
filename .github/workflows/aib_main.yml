@@ -1,8 +1,7 @@
 # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
 # Azure Image Builder work flow using Azure CLI
 
-name: Share data between jobs
-
+name: Azure image builder jobs
 on:
   [ push ]
 
