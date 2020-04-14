@@ -4,22 +4,21 @@
 name: Share data between jobs
 
 on:
-  [ issue_comment ]
+  [ push ]
 
 jobs:
   job_1:
     name: Azure Image builder run 
     runs-on: ubuntu-latest
     env:
-      image_template_name: "iblinux"
-
+      image_template_name: "aiblinux"
       run_output_name: $GITHUB_RUN_NUMBER
       type: "PlatformImage"
       distributor_resource_group: "iblinuxGalleryRG"
       image_gallery_name: "iblinuxGallery"
       image_definition: "UbuntuServer18.04"
       image_name: "UbuntuServer18.04LTS"
-      image_version: 18.04.$GITHUB_RUN_NUMBER
+      image_version: 18.04.LTS$GITHUB_RUN_NUMBER
       image_location: "westus2"
       publisher: "Canonical"
       offer: "UbuntuServer"
