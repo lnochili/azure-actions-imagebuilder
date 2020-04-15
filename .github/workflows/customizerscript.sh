@@ -1,14 +1,14 @@
-#!/usr/bin/sh
+#!/bin/sh
 ### Node.js Installation
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+sudo curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt install nodejs
-node --version
+sudo node --version
 
 ## Creating Hello World App
 sudo mkdir -p /var/www/myapp
-cd /var/www/myapp
-npm init --yes
-echo "var http = require('http'); 
+sudo cd /var/www/myapp
+sudo npm init --yes
+sudo echo "var http = require('http'); 
 http.createServer(function(req,res){ 
         res.writeHead(200, { 'Content-Type': 'text/plain' }); 
         res.end('Hello World!');
