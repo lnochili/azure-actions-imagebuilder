@@ -33,9 +33,8 @@
                         "source": "azVmImageBuilder",
                         "baseosimg": "ubuntu1804",
                         "userTags": "<artfactTags>"
-                        }
-                    },
-                      "replicationRegions": [
+                        },
+                     "replicationRegions": [
                          "westcentralus",
                          "westus2"
                     ]
