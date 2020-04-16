@@ -19,3 +19,5 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Test shell command'
+        run: 'echo Hello world' 
