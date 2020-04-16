@@ -3,7 +3,8 @@
 
 name: Azure image builder jobs
 on:
-  [ push ]
+  [ issue_comment ]
+  #[ push ]
 
 jobs:
   job_1:
