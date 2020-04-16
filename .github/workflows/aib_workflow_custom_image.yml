@@ -4,7 +4,8 @@
 name: Azure image builder workflow
 on:
   push:
-    branches: [ master/aib_workflow_custom_image.yml ]
+    paths: 
+      [ .github/workflows/aib_workflow_custom_image.yml ]
 
 jobs:
   job_1:
