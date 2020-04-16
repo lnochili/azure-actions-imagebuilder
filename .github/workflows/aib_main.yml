@@ -3,8 +3,8 @@
 
 name: Azure image builder jobs
 on:
-  [ issue_comment ]
-  #[ push ]
+  push:
+    paths: [ .github/workflows/aib_main.yml ]
 
 jobs:
   job_1:
