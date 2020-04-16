@@ -5,7 +5,7 @@ name: Azure workflow test sample
 on:
   push:
     paths: 
-      [ .github/workflows/aib_test_wrokflow.yml ]
+      [ .github/workflows/aib_test_workflow.yml ]
 
 jobs:
   job_1:
