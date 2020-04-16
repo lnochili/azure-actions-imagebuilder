@@ -36,7 +36,8 @@
                         }
                     },
                       "replicationRegions": [
-                      "westcentralus"
+                         "westcentralus",
+                         "westus2"
                     ]
                 }
             ]
