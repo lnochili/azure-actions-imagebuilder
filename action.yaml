@@ -9,24 +9,37 @@ jobs:
     - name: 'Run Azure image builder'
       uses: azure/imageBuildery@v0
       with: 
-        subscriptionID: "xxxxxx"
-        ResourceGroupName: "distributorRG"
+        ResourceGroupName: distributorRG
         imageType: PlatformImage
-        imagebuilderTemplateName: ubuntu1804  ### Standard templates will be part of this action repository####
+        imagebuilderTemplateName: ubuntu1804 
         buildTimeoutInMinutes: 80 
+        source: 
+          - offer:
+          - publisher:
+          - sku:
+          - os-type: 
         #####List of Customizer values, comma separated#########
-        customizer-type: [ "shell", "shell-inline"]
-        customizer-name: [ "runCustomScript", "setupBuildPath"]
-        #############List of source script or inline commands #############
-        customizer-source: 
-                  ["https://raw.githubusercontent.com/lnochili/learn-git/master/aib-shellscript.sh",
-                    "sudo mkdir /buildArtifacts; sudo cp /tmp/index.html /buildArtifacts/index.html;" ]
-        ############List of customizer destination on the image########
-        customizer-destination: ["/tmp/aib-hostnameScript.sh"]
-
+        customizer:
+          [
+            [
+            - type: shell
+            - name: runCustomScript
+            - source: https://raw.githubusercontent.com/lnochili/learn-git/master/aib-shellscript.sh
+            - destination: /tmp/aib-hostnameScript.sh
+            ],
+            [
+            - type: shell-inline
+            - name: setupBuildPath
+            - source:
+                sudo mkdir /buildArtifacts
+                sudo cp /tmp/index.html /buildArtifacts/index.html
+            - destination: /tmp/aib-hostnameScript.sh
+            ]
+          ]
         ########Distributor details #############
-        distributor-type: ManagedImage
-        distributor-imagedef: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>
-        distributor-location: "West US2"
-        distributor-runOutputName: imageDefName.${BuildID}  #### this ID needs to be Unique
-        distributor-artifactTags: "UbuntuServer 18.04LTS"
+        distributor:
+          - type: ManagedImage
+          - imagedef: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>
+          - location: "West US2"
+          - runOutputName: imageDefName.${BuildID}  #### this ID needs to be Unique
+          - artifactTags: "UbuntuServer 18.04LTS"
