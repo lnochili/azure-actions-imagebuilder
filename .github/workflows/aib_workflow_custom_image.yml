@@ -1,0 +1,20 @@
+# https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
+# Azure Image Builder work flow using Azure CLI
+
+name: Azure image builder workflow
+on:
+  push:
+    branches: [ master/aib_workflow_custom_image.yml ]
+
+jobs:
+  job_1:
+    name: Azure Image builder run 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout Github Action'
+        uses: actions/checkout@master    
+      - name: azure authentication
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
