@@ -57,13 +57,15 @@ jobs:
             subscriptionId="${temp%\"}"
             rgName=${{ env.distributor_resource_group }}
             imgLocation=${{ env.image_location }}
-            imgDefName=${{ env.image_definition}}
+            imgDefName=${{ env.image_definition }}
+            imgGalleryName=${{ env.image_gallery_name }}
             runOutputName=${{ env.run_output_name }}
             userTags=${{ env.version }}$runOutputName
             curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<region>/$imgLocation/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<ImageDefName>/$imgDefName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<ImageGalleryName>/$imgGalleryName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<runOutputName>/$runOutputName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<resourceGroupID>/$rgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<artfactTags>/$userTags/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
