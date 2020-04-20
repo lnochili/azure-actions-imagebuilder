@@ -21,7 +21,7 @@ jobs:
       image_version: "18.04.01"
       image_location: "westus2"
       publisher: "Canonical"
-      offer: "UbuntuServer"
+      offer: "aib-UbuntuServer"
       sku: "18.04-LTS"
       version: "latest"    
       os_type: "Linux"
