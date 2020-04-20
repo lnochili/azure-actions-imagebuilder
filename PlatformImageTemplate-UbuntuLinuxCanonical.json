@@ -4,7 +4,7 @@
     "location": "WestUS2",
     "dependsOn": [],
     "tags": {
-        "imagebuilderTemplate": "ubuntu1804"
+        "imagebuilderTemplate": "aib-ubuntu"
             },
     "properties": {
 
@@ -31,7 +31,7 @@
                     "runOutputName": "<runOutputName>",
                     "artifactTags": {
                         "source": "azVmImageBuilder",
-                        "baseosimg": "ubuntu1804",
+                        "baseosimg": "aib-ubuntu",
                         "userTags": "<artfactTags>"
                         },
                      "replicationRegions": [
