@@ -25,7 +25,7 @@
             },
         "distribute": 
             [
-                {   "type":"ManagedImage",
+                {   "type":"SharedImage",
                     "imageId": "/subscriptions/<subscriptionID>/resourceGroups/<resourceGroupID>/providers/Microsoft.Compute/images/<ImageName>",
                     "location": "WestUS2",
                     "runOutputName": "<runOutputName>",
