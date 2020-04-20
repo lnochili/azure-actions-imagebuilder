@@ -19,7 +19,7 @@
         "source": {
             "type": "PlatformImage",
                 "publisher": "Canonical",
-                "offer": "UbuntuServer",
+                "offer": "aib-UbuntuServer",
                 "sku": "18.04-LTS",
                 "version": "latest"          
             },
