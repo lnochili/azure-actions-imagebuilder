@@ -26,7 +26,7 @@
         "distribute": 
             [
                 {   "type":"SharedImage",
-                    "galleryImageId": "/subscriptions/<subscriptionID>/resourceGroups/<resourceGroupID>/providers/Microsoft.Compute/images/<ImageDefName>",
+                    "galleryImageId": "/subscriptions/<subscriptionID>/resourceGroups/<resourceGroupID>/providers/Microsoft.Compute/galleries/<ImageGalleryName>/images/<ImageDefName>",
                     "location": "WestUS2",
                     "runOutputName": "<runOutputName>",
                     "artifactTags": {
