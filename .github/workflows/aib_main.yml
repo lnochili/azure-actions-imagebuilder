@@ -79,5 +79,5 @@ jobs:
             echo "Running the template"
             az image builder show --resource-group ${{ env.distributor_resource_group }} --name ${{ env.image_template_name }}
             az image builder run --resource-group ${{ env.distributor_resource_group }}  --name ${{ env.image_template_name }} 
-            echo "Creating the image version"
-            az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name ${{ env.image_gallery_name }} --gallery-image-definition ${{ env.image_definition }} --gallery-image-version ${{ env.image_version }} --managed-image ${{ env.image_name }}
+            #echo "Creating the image version"
+            #az sig image-version create --resource-group ${{ env.distributor_resource_group }} --gallery-name ${{ env.image_gallery_name }} --gallery-image-definition ${{ env.image_definition }} --gallery-image-version ${{ env.image_version }} --managed-image ${{ env.image_name }}
