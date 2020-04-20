@@ -63,7 +63,7 @@ jobs:
             curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<region>/$imgLocation/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-            sed -i -e "s/<ImageDefName>/$img_defition/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            sed -i -e "s/<ImageDefName>/$img_definition/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<runOutputName>/$runOutputName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<resourceGroupID>/$rgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<artfactTags>/$userTags/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
