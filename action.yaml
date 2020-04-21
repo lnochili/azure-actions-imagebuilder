@@ -1,45 +1,92 @@
-on: push
+on: 
+  push
 jobs:
-  build-and-deploy:
+  create-run-ibtemplate:
     runs-on: ubuntu-latest
     steps:
-    # checkout the repo
-    - name: 'Checkout Github Action' 
-      uses: actions/checkout@master
-    - name: 'Run Azure image builder'
-      uses: azure/imageBuildery@v0
-      with: 
-        ResourceGroupName: distributorRG
-        imageType: PlatformImage
-        imagebuilderTemplateName: ubuntu1804 
-        buildTimeoutInMinutes: 80 
-        source: 
-          - offer:
-          - publisher:
-          - sku:
-          - os-type: 
-        #####List of Customizer values, comma separated#########
-        customizer:
-          [
-            [
-            - type: shell
-            - name: runCustomScript
-            - source: https://raw.githubusercontent.com/lnochili/learn-git/master/aib-shellscript.sh
-            - destination: /tmp/aib-hostnameScript.sh
-            ],
-            [
-            - type: shell-inline
-            - name: setupBuildPath
-            - source:
-                sudo mkdir /buildArtifacts
-                sudo cp /tmp/index.html /buildArtifacts/index.html
-            - destination: /tmp/aib-hostnameScript.sh
-            ]
-          ]
-        ########Distributor details #############
-        distributor:
-          - type: ManagedImage
-          - imagedef: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>
-          - location: "West US2"
-          - runOutputName: imageDefName.${BuildID}  #### this ID needs to be Unique
-          - artifactTags: "UbuntuServer 18.04LTS"
+      - name: 'Checkout Github Action'
+        uses: actions/checkout@master
+
+      - name: azure authentication
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'create and run Azure image builder'
+        uses: azure/imageBuilder@v0
+      - inputs: 
+          resourcegroupname:  #mandatory
+             description: 'Azure Resource Group to create IB Template'
+             required: string
+             default: null 
+          imageType: #mandatory
+            description: 'Source image type'
+            required: string
+            default: 'PlatformImage'
+          buildTimeoutInMinutes: #Optional
+            description: 'Image builder timeout'
+            required: integer
+            default: 80
+          imagebuilderTemplateName:  #mandatory
+            description: 'Template resource name'
+            required: string
+            default: ''
+          source-os-type: #mandatory
+            description: 'Source OS type'
+            required: string
+            default: 'linux' 
+          source-image: #mandatory
+            description: 'Source Image details in format-( publisher:offer:sku:version )'
+            required: string
+            default: "Canonical:UbuntuServer:18.04-LTS:latest"      
+          #####List of Customizer values, comma separated#########
+          customizer-type: #optional
+            description: 'Customizer type ShellScriptPath | InlineScript | File'
+            required: string
+            default: ""
+          customizer-name: #mandatory if customizer type is declared
+            description: 'Customizer name'
+            required: string
+            default: ""
+          customizer-source: #mandatory if customizer type is declared
+            description: 'customizer source URI/path/multiline cmds'
+            required: string
+            default: ""
+          customizer-detination: #mandatory if customizer type is declared
+            description: 'customizer destination for File type customizer'
+            required: string
+            default: ""
+          ########Distributor details #############
+          distributor-type: #optional
+            description: 'Distributor type ManagedImage or Shared Image gallery'
+            required: string  #[ManagedImage|SharedImage]
+            default: ManagedImage
+          ManagedImage-resourcegroup: #mandatory if distributor type is ManagedImage'
+            description: 'Resource group for creating managed image'
+            required: string #
+            default: same as template resource group
+          sig-imagedefinition: #mandatory if distributor type is shared image'
+            description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
+            required: string 
+            default: ""
+          sig-location: #mandatory if distributor type is shared image'
+            description: ' location of image definition  '
+            required: string
+            default:  same as Image Gallery Resource Group 
+          sig-runOutputName: #optional
+            description: 'To query image template run status to get shared image version details'
+            required: string
+            default: {{ sig-imagedefinition }}.$GITHUB_RUNNUMBER  #### this ID needs to be Unique
+          sig-artifactTags: #optional
+            description: ' Tags for images in Gallery or managed or VHD '
+            required: multiline or single line strings
+            default: 
+              {{ imagebuildertemplatename}}
+              {{ source-ostype }}
+          output:
+            image-builder-template-status: #mandatory
+            description: 'Status of image builder template run status'
+            required: string   # Values of Provisioning: "Succeeded" or "Failed"
+            sig-runOutputName: #optional and will be emitted when template run was successful
+            description: 'image template run id to query and get shared image version details'
+            required: string
+            
