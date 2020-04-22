@@ -14,19 +14,19 @@ jobs:
       - name: 'create and run Azure image builder'
         uses: azure/imageBuilder@v0
       - inputs: 
-          resourcegroupname:  #mandatory
+          resource-group-name:  #mandatory
              description: 'Azure Resource Group to create IB Template'
              required: string
              default: null 
-          imageType: #mandatory
+          image-type: #mandatory
             description: 'Source image type'
             required: string
             default: 'PlatformImage'
-          buildTimeoutInMinutes: #Optional
+          build-timeout-in-minutes: #Optional
             description: 'Image builder timeout'
             required: integer
             default: 80
-          imagebuilderTemplateName:  #mandatory
+          imagebuilder-template-name:  #mandatory
             description: 'Template resource name'
             required: string
             default: ''
@@ -60,11 +60,11 @@ jobs:
             description: 'Distributor type ManagedImage or Shared Image gallery'
             required: string  #[ManagedImage|SharedImage]
             default: ManagedImage
-          ManagedImage-resourcegroup: #mandatory if distributor type is ManagedImage'
+          managed-image-resourcegroup: #mandatory if distributor type is ManagedImage'
             description: 'Resource group for creating managed image'
             required: string #
             default: same as template resource group
-          sig-imagedefinition: #mandatory if distributor type is shared image'
+          sig-image-definition: #mandatory if distributor type is shared image'
             description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
             required: string 
             default: ""
@@ -72,7 +72,7 @@ jobs:
             description: ' location of image definition  '
             required: string
             default:  same as Image Gallery Resource Group 
-          sig-runOutputName: #optional
+          sig-runoutput-name: #optional
             description: 'To query image template run status to get shared image version details'
             required: string
             default: {{ sig-imagedefinition }}.$GITHUB_RUNNUMBER  #### this ID needs to be Unique
@@ -82,6 +82,10 @@ jobs:
             default: 
               {{ imagebuildertemplatename}}
               {{ source-ostype }}
+          vhd-storage-account: #mandatory if distributor type is VHD
+            description: 'storage account for creating VHD'
+            required: string #
+            default: same as template resource group
           output:
             image-builder-template-status: #mandatory
             description: 'Status of image builder template run status'
