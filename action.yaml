@@ -29,29 +29,27 @@ jobs:
           imagebuilder-template-name:  #mandatory
             description: 'Template resource name'
             required: string
-            default: ''
           source-os-type: #mandatory
             description: 'Source OS type'
             required: string
             default: 'linux' 
-          source-image: #mandatory
-            description: 'Source Image details in format-( publisher:offer:sku:version )'
-            required: string
-            default: "Canonical:UbuntuServer:18.04-LTS:latest"      
+          source-image: #mandatory in format : { publisher:offer:sku:version }; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
+            description: 'Source Image details" '
+            required: string  
           #####List of Customizer values, comma separated#########
           customizer-type: #optional
             description: 'Customizer type ShellScriptPath | InlineScript | File'
             required: string
             default: ""
-          customizer-name: #mandatory if customizer type is declared
+          customizer-name: #mandatory only if customizer type is declared
             description: 'Customizer name'
             required: string
             default: ""
-          customizer-source: #mandatory if customizer type is declared
+          customizer-source: #mandatory only if customizer type is declared
             description: 'customizer source URI/path/multiline cmds'
             required: string
             default: ""
-          customizer-detination: #mandatory if customizer type is declared
+          customizer-detination: #mandatory only if customizer type is declared
             description: 'customizer destination for File type customizer'
             required: string
             default: ""
@@ -63,7 +61,7 @@ jobs:
           managed-image-resourcegroup: #mandatory if distributor type is ManagedImage'
             description: 'Resource group for creating managed image'
             required: string #
-            default: same as template resource group
+            default: $resource-group-name   #same as template resource group
           sig-image-definition: #mandatory if distributor type is shared image'
             description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
             required: string 
@@ -75,22 +73,20 @@ jobs:
           sig-runoutput-name: #optional
             description: 'To query image template run status to get shared image version details'
             required: string
-            default: {{ sig-imagedefinition }}.$GITHUB_RUNNUMBER  #### this ID needs to be Unique
-          sig-artifactTags: #optional
-            description: ' Tags for images in Gallery or managed or VHD '
-            required: multiline or single line strings
-            default: 
-              {{ imagebuildertemplatename}}
-              {{ source-ostype }}
+            default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique
+          sig-artifactTags: #optional 
+            description: 'Tags for images in Gallery or managed or VHD '
+            required: string
+            default: '$imagebuilder-template-name; $source-os-type'
           vhd-storage-account: #mandatory if distributor type is VHD
             description: 'storage account for creating VHD'
             required: string #
             default: same as template resource group
           output:
             image-builder-template-status: #mandatory
-            description: 'Status of image builder template run status'
-            required: string   # Values of Provisioning: "Succeeded" or "Failed"
-            sig-runOutputName: #optional and will be emitted when template run was successful
-            description: 'image template run id to query and get shared image version details'
-            required: string
+              description: 'Status of image builder template run status'
+              required: string   # Values of Provisioning: "Succeeded" or "Failed"
+            sig-runOutputName: #mandatory and will be emitted when template run was successful
+              description: 'image template run id to query and get shared image version details'
+              required: string
             
