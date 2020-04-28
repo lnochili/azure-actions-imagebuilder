@@ -78,10 +78,13 @@ jobs:
             required: string
             default: $imagebuilder-template-name; $source-os-type'
         - outputs:
-            image-builder-template-status: #mandatory
+            ## the outputs of the Image Builder run can be used by the subsequent action 
+            image-builder-run-status: #mandatory
               description: 'Status of image builder template run status'
               required: string   # Values of Provisioning: "Succeeded" or "Failed"
-            sig-runOutputName: #mandatory and will be emitted when template run was successful
-              description: 'image template run id to query and get shared image version details'
+            run-output-name: #mandatory and will be emitted when template run was successful
+              description: 'image template run id to query in subsequent actions'
               required: string
-            
+             vhd-uri: #If the distributor is a VHD, the artifact URI will have the URI to the image which includes Azure storage account
+              description: 'vhd image uri for subsequent actions'
+              required: string
