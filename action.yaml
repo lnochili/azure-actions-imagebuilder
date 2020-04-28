@@ -18,17 +18,18 @@ jobs:
              description: 'Azure Resource Group to create IB Template'
              required: string
              default: null 
-          image-type: #mandatory
-            description: 'Source image type'
+          image-type: #optional [ManagedImage | GalleryImage | PlatformImage]
+            description: 'Source image type' 
             required: string
             default: 'PlatformImage'
           build-timeout-in-minutes: #Optional
             description: 'Image builder timeout'
             required: integer
             default: 80
-          imagebuilder-template-name:  #mandatory
+          imagebuilder-template-name:  #optional
             description: 'Template resource name'
             required: string
+            default: [generated-unique-string based on rg name and imagetype]
           source-os-type: #mandatory
             description: 'Source OS type'
             required: string
@@ -37,22 +38,22 @@ jobs:
             description: 'Source Image details" '
             required: string  
           #####List of Customizer values, comma separated#########
-          customizer-type: #optional
+          customizer-type: #optional [ShellScriptPath | InlineScript | File]
             description: 'Customizer type ShellScriptPath | InlineScript | File'
             required: string
-            default: ""
-          customizer-name: #mandatory only if customizer type is declared
+            default: "File"
+          customizer-name: #optional only if customizer type is declared
             description: 'Customizer name'
             required: string
-            default: ""
-          customizer-source: #mandatory only if customizer type is declared
+            default: [Generate a name based on workflow name]
+          customizer-source: #optional only if customizer type is declared
             description: 'customizer source URI/path/multiline cmds'
             required: string
-            default: ""
-          customizer-detination: #mandatory only if customizer type is declared
+            default: [folder path of github artifacts]
+          customizer-destination: #optional
             description: 'customizer destination for File type customizer'
             required: string
-            default: ""
+            default: [a working directory in VM]
           ########Distributor details #############
           distributor-type: #optional
             description: 'Distributor type ManagedImage or Shared Image gallery'
