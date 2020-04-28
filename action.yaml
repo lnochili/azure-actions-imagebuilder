@@ -83,6 +83,6 @@ jobs:
             image-builder-run-status: # Values of Provisioning: "Succeeded" or "Failed"
               description: 'Status of image builder template run status'
             run-output-name: #mandatory and will be emitted when template run was successful
-              description: 'image template run id to query in subsequent actions
+              description: 'image template run id to query in subsequent actions'
             vhd-uri: #If the distributor is a VHD, the artifact URI will have the URI to the image which includes Azure storage account
               description: 'vhd image uri for subsequent actions'
