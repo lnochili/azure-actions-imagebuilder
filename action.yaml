@@ -65,11 +65,10 @@ jobs:
           sig-image-definition: #mandatory if distributor type is shared image'
             description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
             required: string 
-            default: ""
           sig-location: #mandatory if distributor type is shared image'
             description: ' location of image definition  '
             required: string
-            default:  same as Image Gallery Resource Group 
+            default:  #same as Image Gallery Resource Group 
           sig-runoutput-name: #optional
             description: 'To query image template run status to get shared image version details'
             required: string
@@ -77,12 +76,8 @@ jobs:
           sig-artifactTags: #optional 
             description: 'Tags for images in Gallery or managed or VHD '
             required: string
-            default: '$imagebuilder-template-name; $source-os-type'
-          vhd-storage-account: #mandatory if distributor type is VHD
-            description: 'storage account for creating VHD'
-            required: string #
-            default: same as template resource group
-          output:
+            default: $imagebuilder-template-name; $source-os-type'
+        - outputs:
             image-builder-template-status: #mandatory
               description: 'Status of image builder template run status'
               required: string   # Values of Provisioning: "Succeeded" or "Failed"
