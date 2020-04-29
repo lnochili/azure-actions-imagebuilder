@@ -12,7 +12,7 @@ inputs:
   image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
     description: 'Source image type'
     required: string
-    default: 'PlatformImage
+    default: 'PlatformImage'
   build-timeout-in-minutes: #Optional  Defaults timeout is set to 80 minutes
     description: 'Image builder timeout'
     required: integer
