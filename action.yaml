@@ -43,7 +43,7 @@ inputs:
   customizer-detination: #mandatory only if customizer type is declared
     description: 'customizer destination for File type customizer'
     required: string
-    default: ""
+    default: "/tmp"
    ########Distributor details #############
   distributor-type: #optional
     description: 'Distributor type: ManagedImage or SharedGalleryImage or VHD'
