@@ -24,7 +24,6 @@ inputs:
   source-os-type: #mandatory 
     description: 'Source OS type'
     required: string
-    default: 'linux' 
   source-image: #mandatory in format - { publisher:offer:sku:version }; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
     description: 'Source Image details" '
     required: string  
