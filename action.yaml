@@ -1,88 +1,81 @@
-on: 
-  push
-jobs:
-  create-run-ibtemplate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout Github Action'
-        uses: actions/checkout@master
-
-      - name: azure authentication
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: 'create and run Azure image builder'
-        uses: azure/imageBuilder@v0
-      - inputs: 
-          resource-group-name:  #Optional if the Login user/spn has permissions to create RG
-             description: 'Azure Resource Group to create IB Template'
-             required: string
-             default: #Unique name  
-          image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
-            description: 'Source image type'
-            required: string
-            default: 'PlatformImage'
-          build-timeout-in-minutes: #Optional  Defaults timeout is set to 80 minutes
-            description: 'Image builder timeout'
-            required: integer
-            default: 80 
-          imagebuilder-template-name:  #optional  if need to be user-defined
-            description: 'Template resource name'
-            required: string
-            default:  #Unique value based on Github workflow, ResourceGroup and the source OS type
-          source-os-type: #mandatory 
-            description: 'Source OS type'
-            required: string
-            default: 'linux' 
-          source-image: #mandatory in format - { publisher:offer:sku:version }; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
-            description: 'Source Image details" '
-            required: string  
-          #####Details user defined Customizer, default to the github artifacts ########
-          customizer-type: #optional   defaults to File to push the Github artifacts
-            description: 'Customizer type ShellScriptPath | InlineScript | File'
-            required: string
-            default: "File"
-          customizer-name: #optional 
-            description: 'Unique Customizer name'
-            required: string
-            default: #Name of Build Artifacts
-          customizer-source: #optional... required only if customizer type is declared
-            description: 'customizer source URI/path/multiline cmds or default path builartficats'
-            required: string
-            default: ""
-          customizer-detination: #mandatory only if customizer type is declared
-            description: 'customizer destination for File type customizer'
-            required: string
-            default: ""
-          ########Distributor details #############
-          distributor-type: #optional
-            description: 'Distributor type: ManagedImage or SharedGalleryImage or VHD'
-            required: string  #[ManagedImage|SharedImage|VHD]
-            default: ManagedImage
-          image-resourcegroup: optional #required only if distributor type needs to be in a different RG'
-            description: 'Target Resource group for creating  image'
-            required: string 
-            default: $resource-group-name   #same as template resource group
-          sig-image-definition: optional #Required with SharedGalleryImage, only if an existing sharedGalleryImage definition needs to used'
-            description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
-            required: string
-            default: #Unique Image definition to be created
-          sig-location: optional  #mandatory only if distributor location is different than the Image Template Location'
-            description: ' location of image definition  '
-            required: string
-            default:  #same as Image Gallery Resource Group 
-          sig-runoutput-name: #optional 
-            description: 'To query image template run status to get shared image version details'
-            required: string
-            default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique every time it runs
-          sig-artifactTags: #optional -- only required to provide user defined tags
-            description: 'Tags for custom images created by Image Builder'
-            required: string
-            default: $imagebuilder-template-name; $source-os-type'
-        - outputs: ## the following outputs are set by the IB Action so that it can be used by the subsequent actions 
-            image-builder-run-status: # Values of Provisioning: "Succeeded" or "Failed"
-              description: 'Status of image builder template run status'
-            run-output-name: #mandatory and will be emitted when template run was successful
-              description: 'image template run id to query in subsequent actions'
-            vhd-uri: #If the distributor is a VHD, the artifact URI will have the URI to the image which includes Azure storage account
-              description: 'vhd image uri for subsequent actions'
+name: 'Azure image builder - azure/imageBuilder@v0'
+description: 'Building Custom Images for Azure using Azure Image Builder'
+inputs: 
+  nowait-mode:  #Optional 
+    description: 'Run Image builder in Nowait mode or not'
+    required: boolean
+    default: 'false'
+  resource-group-name:  #Optional if the Login user/spn has permissions to create RG
+    description: 'Azure Resource Group to create IB Template'
+    required: string
+    default: #Unique name  
+  image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
+    description: 'Source image type'
+    required: string
+    default: 'PlatformImage
+  build-timeout-in-minutes: #Optional  Defaults timeout is set to 80 minutes
+    description: 'Image builder timeout'
+    required: integer
+    default: 80 
+  imagebuilder-template-name:  #optional  if need to be user-defined
+    description: 'Template resource name'
+    required: string
+    default:  #Unique value based on Github workflow, ResourceGroup and the source OS type
+  source-os-type: #mandatory 
+    description: 'Source OS type'
+    required: string
+    default: 'linux' 
+  source-image: #mandatory in format - { publisher:offer:sku:version }; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
+    description: 'Source Image details" '
+    required: string  
+   #####Details user defined Customizer, default to the github artifacts ########
+  customizer-type: #optional   defaults to File to push the Github artifacts
+    description: 'Customizer type ShellScriptPath | InlineScript | File'
+    required: string
+    default: "File"
+  customizer-name: #optional 
+    description: 'Unique Customizer name'
+    required: string
+    default: #Name of Build Artifacts
+  customizer-source: #optional... required only if customizer type is declared
+    description: 'customizer source URI/path/multiline cmds or default path builartficats'
+    required: string
+    default: ""
+  customizer-detination: #mandatory only if customizer type is declared
+    description: 'customizer destination for File type customizer'
+    required: string
+    default: ""
+   ########Distributor details #############
+  distributor-type: #optional
+    description: 'Distributor type: ManagedImage or SharedGalleryImage or VHD'
+    required: string  #[ManagedImage|SharedImage|VHD]
+    default: ManagedImage
+  image-resourcegroup: optional #required only if distributor type needs to be in a different RG'
+    description: 'Target Resource group for creating  image'
+    required: string 
+    default: $resource-group-name   #same as template resource group
+  sig-image-definition: optional #Required with SharedGalleryImage, only if an existing sharedGalleryImage definition needs to used'
+    description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
+    required: string
+    default: #Unique Image definition to be created
+  sig-location: optional  #mandatory only if distributor location is different than the Image Template Location'
+    description: ' location of image definition  '
+    required: string
+    default:  #same as Image Gallery Resource Group 
+  sig-runoutput-name: #optional 
+    description: 'To query image template run status to get shared image version details'
+    required: string
+    default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique every time it runs
+  sig-artifactTags: #optional -- only required to provide user defined tags
+    description: 'Tags for custom images created by Image Builder'
+    required: string
+    default: $imagebuilder-template-name; $source-os-type'
+outputs: ## the following outputs are set by the IB Action so that it can be used by the subsequent actions 
+  image-builder-run-status: # Values of Provisioning: "Succeeded" or "Failed"
+    description: 'Status of image builder template run status'
+  run-output-name: #mandatory and will be emitted when template run was successful
+    description: 'image template run id to query in subsequent actions'
+  artifacts-uri: #The artifact URI will have the URI to the image published
+    description: 'Image uri for subsequent actions'
+  webhook-uri: #If the nowait-mode was selected, the webhook-uri will be set to the webhook that can give the status of Run 
+    description: 'Webhook URI to query and get the status of run'
