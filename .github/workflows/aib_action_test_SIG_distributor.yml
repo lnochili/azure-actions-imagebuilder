@@ -1,0 +1,56 @@
+# https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
+# Azure Image Builder work flow using Azure CLI and AIB Action
+
+name: Azure workflow test sample
+on:
+  push:
+    paths: 
+      - master 
+     # [ .github/workflows/aib_action_test_workflow.yml ]
+#workflow using Image builder Action which takes Managed Image as source and Shared image gallery as distributor
+jobs:
+  custom-image-uri: ""
+  job_1:
+    name: Azure Image builder run 
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Github Action'
+        uses: actions/checkout@master    
+      - name: azure authentication
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+#Image builder action with minimal inputs to build custom linux image as Managed Image  
+      - name: 'Test Github action for Azure Image builder with Managed Image as Source'
+        uses: azure/azureimagebuilder@v0
+        with:
+          resource-group-name: 'iblinuxgalleryrg'
+          source-image: 'Ubuntu:Canonical:18.04-LTS:latest'
+          source-os-type:: 'linux'
+          customizer-source:: $GITHUB_WORKSPACE/src
+          customizer-destination: /var/www/myapp
+          imagebuilder-template-name: aib_managed_image_template
+          build-timeout-in-minutes: 60 
+          image-type: 'ManagedImage'
+          source-image: "/subscriptions/xxxxx-xxxx-xxxx/resourceGroups/XXX-ManagedImageRG/providers/Microsoft.Compute/images/aib_linux-image"
+          customizer-source: $GITHUB_WORKSPACE/src 
+          customizer-detination: "/tmp/src"
+   ########Distributor details #############
+          distributor-type: SharedImage  
+          sig-image-definition: '/subscriptions/xxxxx-xxxx-xxxx/resourceGroups/XXX-SharedImageRG//providers/Microsoft.Compute/images/aib_linux_shared'
+          sig-location: westcentralus
+          sig-runoutput-name: 'aib_sig_linux.ub18.04'
+          artifactTags: ManagedImageSource: $source-image
+ 
+#Image builder action complete to build custom linux image with build artifacts with a ManagedImage as the source        
+      - name: 'echo Image URI if Image builder step succeeded'
+          #Persist the output of run
+        if: ${{ success() }}
+        run: 
+         cutom-image-uri=outputs.artifacts-uri
+         echo $cusom-image-uri
+            
+          
+                 
+      
