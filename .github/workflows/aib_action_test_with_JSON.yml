@@ -26,10 +26,8 @@ jobs:
         uses: azure/azureimagebuilder@v0
         with:
           resource-group-name: 'iblinuxgalleryrg'
-          source-image: 'Ubuntu:Canonical:18.04-LTS:latest'
-          source-os-type:: 'linux'
-          customizer-source:: $GITHUB_WORKSPACE/src
-          customizer-destination: /var/www/myapp
+          image-builder-template-name: $GITHUB_WORKSPACE/PlatformImageTemplate-UbuntuLinuxCanonical.json
+
           
 #Image builder action complete to build custom linux image with build artifacts in the image        
       - name: 'echo Image URI if Image builder step succeeded'
