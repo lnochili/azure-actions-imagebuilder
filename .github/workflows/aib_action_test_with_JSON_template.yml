@@ -25,7 +25,7 @@ jobs:
       - name: 'Test Github action for Azure Image builder'
         uses: azure/azureimagebuilder@v0
         with:
-          resource-group-name: 'iblinuxgalleryrg'
+          resource-group-name: 'aib_example_rg'
           image-builder-template-name: $GITHUB_WORKSPACE/PlatformImageTemplate-UbuntuLinuxCanonical.json
 
           
