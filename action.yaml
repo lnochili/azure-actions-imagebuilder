@@ -9,23 +9,27 @@ inputs:
     description: 'Azure Resource Group to create IB Template'
     required: string
     default: #Unique name  
-  image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
-    description: 'Source image type'
+  imagebuilder-template-name:  #optional  If imagebuilder template name is a file name with .JSON extension, no more inputs are required as the ARM Template shall provide all the inputs required 
+    description: 'Template resource name'
     required: string
-    default: 'PlatformImage'
+    default:  #Unique value based on Github workflow, ResourceGroup and the source OS type
   build-timeout-in-minutes: #Optional  Defaults timeout is set to 80 minutes
     description: 'Image builder timeout'
     required: integer
     default: 80 
-  imagebuilder-template-name:  #optional  if need to be user-defined
-    description: 'Template resource name'
+  image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
+    description: 'Source image type'
     required: string
-    default:  #Unique value based on Github workflow, ResourceGroup and the source OS type
+    default: 'PlatformImage'
   source-os-type: #mandatory 
     description: 'Source OS type'
     required: string
-  source-image: #mandatory in format - { publisher:offer:sku:version }; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
-    description: 'Source Image details" '
+  source-image: #mandatory 
+    #format - { publisher:offer:sku:version } if Source Image Type is PlatformImage; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
+    #format - Azure Resource Id if Source is Managed or SharedGalleryImage 
+    # Example for SharedGalleryImage: "/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/galleries/galleryName/images/imageDefinitionName"
+    # Example for ManagedImage: "/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/images/imageName"
+    description: 'Source Image Id or details" 
     required: string  
    #####Details user defined Customizer, default to the github artifacts ########
   customizer-type: #optional   defaults to File to push the Github artifacts
@@ -49,7 +53,7 @@ inputs:
     description: 'Distributor type: ManagedImage or SharedGalleryImage or VHD'
     required: string  #[ManagedImage|SharedImage|VHD]
     default: ManagedImage
-  image-resourcegroup: optional #required only if distributor type needs to be in a different RG'
+  image-resourcegroup: optional #required only if image to be distributed into a different RG'
     description: 'Target Resource group for creating  image'
     required: string 
     default: $resource-group-name   #same as template resource group
@@ -65,7 +69,7 @@ inputs:
     description: 'To query image template run status to get shared image version details'
     required: string
     default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique every time it runs
-  sig-artifactTags: #optional -- only required to provide user defined tags
+  artifactTags: #optional -- only required to provide user defined tags
     description: 'Tags for custom images created by Image Builder'
     required: string
     default: $imagebuilder-template-name; $source-os-type'
