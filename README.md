@@ -49,6 +49,7 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
 ## Create & configure the Github Workflow
 1. Configure the Github Secret with name 'AZURE_CREDENTIALS' that will be used access Azure Subscription
 2. Ensure that following github actions are added as steps to workflow that are to be run prior to running the action for Azure Image Builder
+```
       #Checkout action, if required
         - name: 'Checkout Github Action'
           uses: actions/checkout@master
@@ -57,6 +58,7 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
           uses: azure/login@v1
             with:
               creds: ${{ secrets.AZURE_CREDENTIALS }}
+ ```
   
 ## Add the Github action for Azure Image Builder to the same workflow as a step after the azure authentication step
 The action begins now!!!
