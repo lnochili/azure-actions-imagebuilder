@@ -29,7 +29,7 @@ inputs:
     #format - Azure Resource Id if Source is Managed or SharedGalleryImage 
     # Example for SharedGalleryImage: "/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/galleries/galleryName/images/imageDefinitionName"
     # Example for ManagedImage: "/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/images/imageName"
-    description: 'Source Image Id or details" 
+    description: 'Source Image Id or details' 
     required: string  
    #####Details user defined Customizer, default to the github artifacts ########
   customizer-type: #optional   defaults to File to push the Github artifacts
