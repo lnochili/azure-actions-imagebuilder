@@ -33,7 +33,7 @@ inputs:
     required: string  
    #####Details user defined Customizer, default to the github artifacts ########
   customizer-type: #optional   defaults to File to push the Github artifacts
-    description: 'Customizer type ShellScriptPath | InlineScript | File'
+    description: 'Customizer type Shell|PowerShell'
     required: string
     default: "File"
   customizer-name: #optional 
@@ -48,6 +48,9 @@ inputs:
     description: 'customizer destination for File type customizer'
     required: string
     default: "/tmp"
+  windows-update: 'This value is for Windows images only'
+    required: boolean
+    default: 'false'
    ########Distributor details #############
   distributor-type: #optional
     description: 'Distributor type: ManagedImage or SharedGalleryImage or VHD'
