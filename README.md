@@ -65,24 +65,35 @@ The action begins now!!!
  
 ### Define the inputs required 
  
-#### resource-group-name
-  This is the Resource Group where the temporary Imagebuilder Template resource will be stored. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
-As mentioned in Azure Image Builder docs, when creating a Image Builder template artifact, it creates an additional resource group, ‘'IT_<DestinationResourceGroup>_<TemplateName>_ResourceId'. This resource group is used to create the required Azure resources for running Image Building Process. 
-    - Azure Storage Account to store the image metadata, such as customizer scripts
-    - Azure resources for a Virtual Machine with Public IP. 
-  At the end of the aciton, these temporary resources shall be deleted when the Github action is configured to do so. 
+#### resource-group-name (optional)
+This is the Resource Group where the temporary Imagebuilder Template resource will be stored. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
+  
+As mentioned in Azure Image Builder docs, when creating a Image Builder template artifact, it creates an additional resource group, ‘IT_<DestinationResourceGroup>_<TemplateName>_ResourceId. This resource group is used to create teh temporary Azure resources required for running Image Building Process. 
+* Azure Storage Account to store the image metadata, such as customizer scripts
+* Azure resources for a Virtual Machine with Public IP. 
+At the end of the aciton, these temporary resources shall be deleted when the Github action is configured to do so. 
 
-#### imagebuilder-template-name
+#### imagebuilder-template-name (optional)
   The name of the image builder template resource to be used for creating and running the Image builder service. 
   This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number.
   If the input value is a path or file name containing .JSON extension, no more inputs are required and the input value is considered as  the ARM Template file to be used. The Github Action will consider the ARM template as source for all inputs.
   If the input value is a simple string, it is used to create & run the Image builder template resource in Azure resource Group.
 
-#### nowait-mode
+#### nowait-mode (optional)
   The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'
   
-#### build-timeout-in-minutes
+#### build-timeout-in-minutes (optional)
   The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
+  
+#### image-type (optional)   
+  The source image type that is being used for creating the custom image. Possible values:
+     PlatformImage or SharedGalleryImage or ManagedImage
+  The input is optional and set to 'PlatformImage' by default, if the input value is provided.
+
+#### source-os-type: 
+
+  The Operating System of the base image being used for creating custom image.  Possible Values: Linux or Windows
+  This input value mandatory only if the image type is SharedGalleryImage or ManagedImage
 
 #### Location
 This is the location where the Image Builder will run, we only support a set amount of locations. The source images must be present in this location, so for example, if you are using Shared Image Gallery, a replica must exist in that region.
