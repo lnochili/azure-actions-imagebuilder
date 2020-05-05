@@ -73,6 +73,10 @@ As mentioned in Azure Image Builder docs, when creating a Image Builder template
 * Azure resources for a Virtual Machine with Public IP. 
 At the end of the aciton, these temporary resources shall be deleted when the Github action is configured to do so. 
 
+#### location (optional)
+   This is the Azure region in which the Image Builder will run, currently, there are only limited Azure regions where Azure Image builder service is available. The source images must be present in this location, so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in that Azure region.
+   The value is optional and will be set to the region of Resource Group Name supplied above.
+
 #### imagebuilder-template-name (optional)
   The name of the image builder template resource to be used for creating and running the Image builder service. 
   This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number.
@@ -90,32 +94,24 @@ At the end of the aciton, these temporary resources shall be deleted when the Gi
      PlatformImage or SharedGalleryImage or ManagedImage
   The input is optional and set to 'PlatformImage' by default, if the input value is provided.
 
-#### source-os-type: 
-
-  The Operating System of the base image being used for creating custom image.  Possible Values: Linux or Windows
-  This input value mandatory only if the image type is SharedGalleryImage or ManagedImage
-
-#### Location
-This is the location where the Image Builder will run, we only support a set amount of locations. The source images must be present in this location, so for example, if you are using Shared Image Gallery, a replica must exist in that region.
-
-### Source
-The source images must be of the supported Image Builder OS's. You can choose existing custom images in the same region as Image Builder is running from:
-* Managed Image - You need to pass in the resourceId, for example:
-```json
-/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
+### source-image (mandatory)
+The value of source-image must be set to one of the supported Image Builder OS's. Apart from the Platform images from Azure Market place, You can choose existing custom images in the same region as Image Builder is running.
+ * If the image-type is PlatformImage, the value of source image will be the urn of image which is an output of 
+ ```az vm image list   or az vm image show 
+    format - { publisher:offer:sku:version } if Source Image Type is PlatformImage; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
+ ```
+ * if the image-type is Managed Image - You need to pass in the resourceId of the source image, for example:
+```/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
 ```
-* Azure Shared Image Gallery - You need to pass in the resourceId of the image version, for example:
-```json
-/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber>
+ * If the image-type is SharedGalleryImage - You need to pass in the resourceId of the image version for example:
 ```
+/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
+```
+* Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
-* Marketplace Base Images
-Image Builder will defaults to using the 'latest' version of the supported OS's, you can specify an image version (optional).
+### Customizer details
 
-### Customize
-
-#### Provisioner
-Initialy, we are just supporting two customerizers, 'Shell', and 'PowerShell' and we only support 'inline'. If you want to download scripts, then you can pass inline commands to do so.
+In the Initial version of Github action,  we are supporting two customerizer types, 'Shell', and 'PowerShell'.  The customizer scripts need to be either publicly accessible or part of the github repository.  Github action will upload the the customizer scripts from github repository so that the same can be run by Image Builder to customize the image.
 
 For your OS, select with PowerShell, or Shell.
 
