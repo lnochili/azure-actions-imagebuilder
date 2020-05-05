@@ -49,21 +49,28 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
 ## Create & configure the Github Workflow
 1. Configure the Github Secret with name 'AZURE_CREDENTIALS' that will be used access Azure Subscription
 2. Ensure that following github actions are added as steps to workflow that are to be run prior to running the action for Azure Image Builder
+3. If the build artifacts are to be injected to the custom image, download the artifacts of specific build pipeline
 ```
       #Checkout action, if required
         - name: 'Checkout Github Action'
           uses: actions/checkout@master
+      #Download the build artifacts
+        - name: 'download build artifacts'
+          uses: actions/download-artifacts@v1
+            with:
+              name: example_azure_imagebuilder
       #Required Azure Authentiation Action
         - name: azure authentication
           uses: azure/login@v1
             with:
               creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
  ```
   
-## Add the Github action for Azure Image Builder to the same workflow as a step after the azure authentication step
+## Add the Github action for Azure Image Builder 
 The action begins now!!!
  
-### Define the inputs required 
+### Define the inputs 
  
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be stored. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
@@ -94,7 +101,7 @@ At the end of the aciton, these temporary resources shall be deleted when the Gi
      PlatformImage or SharedGalleryImage or ManagedImage
   The input is optional and set to 'PlatformImage' by default, if the input value is provided.
 
-### source-image (mandatory)
+#### source-image (mandatory)
 The value of source-image must be set to one of the supported Image Builder OS's. Apart from the Platform images from Azure Market place, You can choose existing custom images in the same region as Image Builder is running.
  * If the image-type is PlatformImage, the value of source image will be the urn of image which is an output of 
  ```az vm image list   or az vm image show 
@@ -111,14 +118,21 @@ The value of source-image must be set to one of the supported Image Builder OS's
 
 ### Customizer details
 
-In the Initial version of Github action,  we are supporting two customerizer types, 'Shell', and 'PowerShell'.  The customizer scripts need to be either publicly accessible or part of the github repository.  Github action will upload the the customizer scripts from github repository so that the same can be run by Image Builder to customize the image.
+In the Initial version of Github action,  we are supporting two customerizer types, 'Shell', and 'PowerShell'. Depending on the OS, select with PowerShell, or Shell. The customizer scripts need to be either publicly accessible or part of the github repository.  Github action will upload the the customizer scripts from github repository so that the same can be run by Image Builder to customize the image. 
+This action has been designed to inject Github Build artifacts into the image. To make this work, you will need to setup a Build workflow, and in the setup of the Release pipeline, you must add specifics of the repo of the build artifacts.
+#### customizer-type (optional)
+  The value must be set to one of the ' Shell | PowerShell '.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
 
-For your OS, select with PowerShell, or Shell.
+#### customizer-source & customizer-destination
+  These values are required only if customizer type is declared as Shell or PowerShell. 
+  If the customizer-type is Shell or PowerShell, then the value must be set to the URI for customizer scripts where the URI is accessible public.  
+  The source value must be set to the path in the Github repo, If it is differnt than the default Github build artifacts path. By default, the source value is set to default path of Github build artficats downloaded in the workflow.
+  The destination value must be set to the path By default, the destination value 
 
-#### Windows Update Task
-For Windows only, the task will run Windows Update at the end of the customizations for the task, it will handle the reboots it requires.
+#### customizer-windows-Update (optional)
+ The value is boolean and set to 'false' by default. This value is for Windows images only, the image builder will run Windows Update at the end of the customizations and also handle the reboots it requires.
 
-This is the Windows Update configuration that is executed:
+  Windows Update configuration is executed to install important and recommended Windows Updates, that are not preview:
 ```json
     "type": "WindowsUpdate",
     "searchCriteria": "IsInstalled=0",
@@ -126,8 +140,6 @@ This is the Windows Update configuration that is executed:
         "exclude:$_.Title -like '*Preview*'",
         "include:$true"
 ```
-It will install important and recommended Windows Updates, that are not preview.
-
 #### Build Path
 This task has been initially designed to be able to inject DevOps Build release artifacts into the image. To make this work, you will need to setup a Build Pipeline, and in the setup of the Release pipeline, you must add specific the repo of the build artifacts.
 
