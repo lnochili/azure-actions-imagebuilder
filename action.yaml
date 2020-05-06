@@ -79,7 +79,7 @@ outputs: ## the following outputs are set by the IB Action so that it can be use
     description: 'Status of image builder template run status'
   run-output-name: #mandatory and will be emitted when template run was successful
     description: 'image template run id to query in subsequent actions'
-  output-image-uri: #The artifact URI will have the URI to the image published
+  custom-image-uri: #The artifact URI will have the URI to the image published
     description: 'Image uri for subsequent actions'
   webhook-uri: #If the nowait-mode was selected, the webhook-uri will be set to the webhook that can give the status of Run 
     description: 'Webhook URI to query and get the status of run'
