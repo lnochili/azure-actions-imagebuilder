@@ -27,6 +27,7 @@ jobs:
         with:
           resource-group-name: 'aib_example_rg'
           image-builder-template-name: $GITHUB_WORKSPACE/PlatformImageTemplate-UbuntuLinuxCanonical.json
+          location: 'westcentralus'
 
           
 #Image builder action complete to build custom linux image with build artifacts in the image        
