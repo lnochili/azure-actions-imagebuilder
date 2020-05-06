@@ -64,23 +64,22 @@ inputs:
                   #for ManagedImage, Resource ID of Image to be created: /subscriptions/<subscriptionId>/resourceGroups/<imageResourceGroup/providers/Microsoft.Compute/images/<imageName>"
     required: false # input type: string
     default: #Unique Image definition to be created
-  run-output-name: #optional 
-    description: 'To query image template run status to get shared image version details'
-    required: false # input type: string
-    default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique every time it runs
-  artifact-tags: #optional -- only required to provide user defined tags
+  dist-image-tags: #optional -- only required to provide user defined tags
     description: 'Tags for custom images created by Image Builder'
     required: false # input type: string
     default: $imagebuilder-template-name; $source-os-type'
-  vm-profile: #optional  -- Required only when you want to change the VM Size to run the Image Builder with
+  run-output-name: #optional 
+    description: 'To query image template run status to get shared image version details'
+    required: false # input type: string
+    default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique every time it runsvm-profile: #optional  -- Required only when you want to change the VM Size to run the Image Builder with
     required: false # input type: string
     default: Standard_D1_v2
 outputs: ## the following outputs are set by the IB Action so that it can be used by the subsequent actions 
-  image-builder-run-status: # Values of Provisioning: "Succeeded" or "Failed"
+  imagebuilder-run-status: # Values of Provisioning: "Succeeded" or "Failed"
     description: 'Status of image builder template run status'
   run-output-name: #mandatory and will be emitted when template run was successful
     description: 'image template run id to query in subsequent actions'
-  artifacts-uri: #The artifact URI will have the URI to the image published
+  output-image-uri: #The artifact URI will have the URI to the image published
     description: 'Image uri for subsequent actions'
   webhook-uri: #If the nowait-mode was selected, the webhook-uri will be set to the webhook that can give the status of Run 
     description: 'Webhook URI to query and get the status of run'
