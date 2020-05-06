@@ -175,11 +175,11 @@ Both these values are mandatory if the distributor type is Managed Image or Shar
 * VHD
     * You cannot pass any values to this, Image Builder will create the VHD and the Github action will emit the resource id of VHD as output variable. 
 
-### run-output-name: (optional)
+#### run-output-name: (optional)
 Image Builder Template can be created once and can be run many times to create Shared Gallery Image Versions or to update the existing Managed Image. Every Image builder run is identified with a unique run id.  This input value is to be set if you would like to have a specific name to the run in order to query image template run status to get shared image version details.  
 If the value is not set, this action will create unique run output id based on the image builder template and the Github Run Number of the action/workflow.
 
-### dist-image-tags: (optional)
+#### dist-image-tags: (optional)
 The values set will be used to set the user defined tags on the custom image artifact created.  The user defined tag is set in the format for key:value pair.  If more than one tag is to be set, use comma to separate the tag values.
 This input value is optional and Github action applies default tags even if customer does not provide values to this input.
 
@@ -372,5 +372,51 @@ jobs:
          echo $cusom-image-uri
  ```
 
+### Github action to build custom image of Windows OS from a Shared Gallery Image
+The below example with minimal inputs, creates a custom image of Windows OS from an existing Shared Gallery Image version as the base image, creates a new image version in Shared Image Gallery and replicates the image into the regions westcentralus and westus2. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory. After customising the image, it also updates with latest Windows updates excluing the ones that are in Preview. The output of this action run will set the custom image URI to the VHD in Azure Storage account. 
+```
+name: Azure workflow test sample
+on:
+  push:
+    paths: 
+      - master 
+     # [ .github/workflows/aib_action_test_workflow.yml ]
+#workflow using Image builder Action
+jobs:
+  custom-image-uri: ""
+  job_1:
+    name: Azure Image builder run 
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Github Action'
+        uses: actions/checkout@master   
+      - name: 'Download build artifacts'
+        uses: actions/download-artifacts@v2
+      - name: 'azure authentication'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-
+#Image builder action with minimal inputs to build custom linux image as VHD from Managed Image
+      - name: 'Test Github action for Azure Image builder'
+        uses: azure/azureimagebuilder@v0
+        with:
+          resource-group-name: 'iblinuxgalleryrg'
+          location: 'westcentralus'
+          source-image: '/subscriptions/<subscriptionId>/resourceGroups/<gallery-resource-group>/providers/Microsoft.Compute/galleries/<galleryname>/images/WindowsDataCenter2019R2'
+          source-image-type: 'SharedGalleryImage' 
+          source-os-type:: 'Windows'
+          customizer-source:: $GITHUB_WORKSPACE/src/install.ps1
+          customizer-destination: /var/www/myapp
+          customizer-windows-update: 'true'
+          dist-type: 'SharedGalleryImage'
+          dist-location: 'westcentralus, westus2'
+          dist-image: '/subscriptions/<subscriptionId>/resourceGroups/<gallery-resource-group>/providers/Microsoft.Compute/galleries/<galleryname>/images/WindowsDataCenter2019R2'
+#Image builder action complete to build custom linux image with build artifacts in the image        
+      - name: 'echo Image URI if Image builder step succeeded'
+          #Persist the output of run
+        if: ${{ success() }}
+        run: 
+         cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
+         echo $cusom-image-uri
+```
