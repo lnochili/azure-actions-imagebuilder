@@ -204,6 +204,7 @@ starting run template...
 The image template resource, and ‘'IT_<DestinationResourceGroup>_<TemplateName>' will be deleted.
 
 5. Github action emits output varaibles listed below. You can take the '$(artifactsUri)'variable for use in the next task, or just take its value and build a VM.
+6. 
 
 ## Output DevOps Variables
 * Pub/offer/SKU/Version of the source marketplace image:
