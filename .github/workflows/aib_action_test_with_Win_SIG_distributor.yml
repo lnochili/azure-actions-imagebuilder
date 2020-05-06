@@ -1,0 +1,44 @@
+name: Azure workflow test sample
+on:
+  push:
+    paths: 
+      - master 
+     # [ .github/workflows/aib_action_test_workflow.yml ]
+#workflow using Image builder Action
+jobs:
+  custom-image-uri: ""
+  job_1:
+    name: Azure Image builder run 
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Github Action'
+        uses: actions/checkout@master   
+      - name: 'Download build artifacts'
+        uses: actions/download-artifacts@v2
+      - name: 'azure authentication'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+#Image builder action with minimal inputs to build custom linux image as VHD from Managed Image
+      - name: 'Test Github action for Azure Image builder'
+        uses: azure/azureimagebuilder@v0
+        with:
+          resource-group-name: 'iblinuxgalleryrg'
+          location: 'westcentralus'
+          source-image: '/subscriptions/<subscriptionId>/resourceGroups/<gallery-resource-group>/providers/Microsoft.Compute/galleries/<galleryname>/images/WindowsDataCenter2019R2'
+          source-image-type: 'SharedGalleryImage' 
+          source-os-type:: 'Windows'
+          customizer-source:: $GITHUB_WORKSPACE/src/install.ps1
+          customizer-destination: /var/www/myapp
+          customizer-windows-update: 'true'
+          dist-type: 'SharedGalleryImage'
+          dist-location: 'westcentralus, westus2'
+          dist-image: '/subscriptions/<subscriptionId>/resourceGroups/<gallery-resource-group>/providers/Microsoft.Compute/galleries/<galleryname>/images/WindowsDataCenter2019R2'
+#Image builder action complete to build custom linux image with build artifacts in the image        
+      - name: 'echo Image URI if Image builder step succeeded'
+          #Persist the output of run
+        if: ${{ success() }}
+        run: 
+         cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
+         echo $cusom-image-uri
