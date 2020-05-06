@@ -3,79 +3,78 @@ description: 'Building Custom Images for Azure using Azure Image Builder'
 inputs: 
   nowait-mode:  #Optional 
     description: 'Run Image builder in Nowait mode or not'
-    required: boolean
+    required: false  # input type: boolean
     default: 'false'
-  resource-group-name:  #Optional if the Login user/spn has permissions to create RG
+  resource-group-name:  #mandatory  
     description: 'Azure Resource Group to create IB Template'
-    required: string
-    default: #Unique name  
+    required: false # input type: string
+  location: #mandatory  Set to the region where the source image is present and the location for image builder template
+    description: 'Azure region where source image is present'
+    required: true # input type: string
   imagebuilder-template-name:  #optional  If imagebuilder template name is a file name with .JSON extension, no more inputs are required as the ARM Template shall provide all the inputs required 
     description: 'Template resource name'
-    required: string
-    default:  #Unique value based on Github workflow, ResourceGroup and the source OS type
+    required: false # input type: string
+    default:  #Unique value based on ResourceGroup and the source OS type
   build-timeout-in-minutes: #Optional  Defaults timeout is set to 80 minutes
     description: 'Image builder timeout'
-    required: integer
+    required: false # input type: integer
     default: 80 
-  image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
+  source-image-type: #optional   possible values [PlatformImage|SharedGalleryImage|ManagedImage]
     description: 'Source image type'
-    required: string
+    required: false # input type: string
     default: 'PlatformImage'
   source-os-type: #mandatory 
     description: 'Source OS type'
-    required: string
+    required: true # input type: stringrequired: string
   source-image: #mandatory 
     #format - { publisher:offer:sku:version } if Source Image Type is PlatformImage; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
     #format - Azure Resource Id if Source is Managed or SharedGalleryImage 
     # Example for SharedGalleryImage: "/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/galleries/galleryName/images/imageDefinitionName"
     # Example for ManagedImage: "/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/images/imageName"
     description: 'Source Image Id or details' 
-    required: string  
+    required: true # input type: string 
    #####Details user defined Customizer, default to the github artifacts ########
   customizer-type: #optional   defaults to File to push the Github artifacts
     description: 'Customizer type Shell|PowerShell'
-    required: string
+    required: false # input type: string
     default: "File"
-  customizer-name: #optional 
-    description: 'Unique Customizer name'
-    required: string
-    default: #Name of Build Artifacts
   customizer-source: #optional... required only if customizer type is declared
-    description: 'customizer source URI/path/multiline cmds or default path builartficats'
-    required: string
+    description: 'URI for customizer scripts or path to build artficats'
+    required: false # input type: string
     default: ""
   customizer-detination: #mandatory only if customizer type is declared
     description: 'customizer destination for File type customizer'
-    required: string
+    required: false # input type: string
     default: "/tmp"
-  windows-update: 'This value is for Windows images only'
-    required: boolean
+  customizer-windows-update: 'This value is for Windows images only'
+    required: false # input type: boolean
     default: 'false'
    ########Distributor details #############
-  distributor-type: #optional
+  dist-type: #optional
     description: 'Distributor type: ManagedImage or SharedGalleryImage or VHD'
-    required: string  #[ManagedImage|SharedImage|VHD]
+    required: false # input type: string and possible values are [ ManagedImage|SharedImage|VHD ]
     default: ManagedImage
-  image-resourcegroup: optional #required only if image to be distributed into a different RG'
-    description: 'Target Resource group for creating  image'
-    required: string 
-    default: $resource-group-name   #same as template resource group
-  sig-image-definition: optional #Required with SharedGalleryImage, only if an existing sharedGalleryImage definition needs to used'
-    description: 'Resource ID of image definition in shared image gallery: /subscriptions/<Subscription-ID>/resourceGroups/<GalleryRG>/providers/Microsoft.Compute/images/<imageDefName>'
-    required: string
-    default: #Unique Image definition to be created
-  sig-location: optional  #mandatory only if distributor location is different than the Image Template Location'
+  dist-location: optional  #mandatory only if distributor location is different than the Image Template Location'
     description: ' location of image definition  '
-    required: string
-    default:  #same as Image Gallery Resource Group 
-  sig-runoutput-name: #optional 
+    required: false # input type: string
+    default:  #same as Image Builder Template location
+  dist-resource-id : optional #Required only with SharedGalleryImage | ManagedImage. With VHD type, the resource ID 
+    description: 'Resource ID of distributor image'
+                  #for SharedGalleryImage, Resource ID of Image Definition: /subscriptions/<subscriptionId>/resourceGroups/<galleryResourceGroup>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefinition>'
+                  #for ManagedImage, Resource ID of Image to be created: /subscriptions/<subscriptionId>/resourceGroups/<imageResourceGroup/providers/Microsoft.Compute/images/<imageName>"
+    required: false # input type: string
+    default: #Unique Image definition to be created
+  run-output-name: #optional 
     description: 'To query image template run status to get shared image version details'
-    required: string
+    required: false # input type: string
     default: $sig-image-definition.$GITHUB_RUNNUMBER  #### this ID needs to be Unique every time it runs
-  artifactTags: #optional -- only required to provide user defined tags
+  artifact-tags: #optional -- only required to provide user defined tags
     description: 'Tags for custom images created by Image Builder'
-    required: string
+    required: false # input type: string
     default: $imagebuilder-template-name; $source-os-type'
+  vm-profile: #optional  -- Required only when you want to change the VM Size to run the Image Builder with
+    required: false # input type: string
+    default: Standard_D1_v2
 outputs: ## the following outputs are set by the IB Action so that it can be used by the subsequent actions 
   image-builder-run-status: # Values of Provisioning: "Succeeded" or "Failed"
     description: 'Status of image builder template run status'
