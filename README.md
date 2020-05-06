@@ -9,33 +9,33 @@ This action is designed to take your build artifacts, and inject them into a VM 
 --- Add the action for Azure VM Image Builder
  
 ## Prereqs
-* You must have a Github account/project, in which a Github workflow created
-* You must have an Azure Subscription with a contributor permission to the source and distributor resource groups
-* Register and enable requirements, as per below:
+* You must have access to a Github account or project, in which you have permissions to create a Github workflow 
+* You must have an Azure Subscription with contributor permission to Azure Resource Groups of the source image and distributor images  
+* Register and enable Azure features, as per below:
 
 ```bash
 az feature register --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview
 az feature show --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview | grep state
+```
+# Register and enable for shared image gallery
 
-# register and enable for shared image gallery
-az feature register --namespace Microsoft.Compute --name GalleryPreview
+```az feature register --namespace Microsoft.Compute --name GalleryPreview ```
 
-# wait until it says registered
+Wait until it shows the feature state as "registered"
 
-# check you are registered for the providers
-az provider show -n Microsoft.VirtualMachineImages | grep registrationState
+# check if your subscription is registered for the providers
+```az provider show -n Microsoft.VirtualMachineImages | grep registrationState
 az provider show -n Microsoft.Storage | grep registrationState
 az provider show -n Microsoft.Compute | grep registrationState
 az provider show -n Microsoft.KeyVault | grep registrationState
 ```
 
-If they do not saw registered, run the commented out code below.
+If shown not registered, run the commented out code below.
 ```bash
 ## az provider register -n Microsoft.VirtualMachineImages
 ## az provider register -n Microsoft.Storage
 ## az provider register -n Microsoft.Compute
 ## az provider register -n Microsoft.KeyVault
-
 ```
 ```bash
 # create storage account and blob in resource group
@@ -66,7 +66,6 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
               creds: ${{ secrets.AZURE_CREDENTIALS }}
       
  ```
-  
 ## Add the Github action for Azure Image Builder 
 The action begins now!!!
  
@@ -121,15 +120,23 @@ The value of source-image must be set to one of the supported Image Builder OS's
 In the Initial version of Github action,  we are supporting two customerizer types, 'Shell', and 'PowerShell'. Depending on the OS, select with PowerShell, or Shell. The customizer scripts need to be either publicly accessible or part of the github repository.  Github action will upload the the customizer scripts from github repository so that the same can be run by Image Builder to customize the image. 
 This action has been designed to inject Github Build artifacts into the image. To make this work, you will need to setup a Build workflow, and in the setup of the Release pipeline, you must add specifics of the repo of the build artifacts.
 #### customizer-type (optional)
-  The value must be set to one of the ' Shell | PowerShell '.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
+  The value must be set to one of the ' Shell | PowerShell | InLine | File '.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
 
-#### customizer-source & customizer-destination
-  These values are required only if customizer type is declared as Shell or PowerShell. 
-  If the customizer-type is Shell or PowerShell, then the value must be set to the URI for customizer scripts where the URI is accessible public.  
-  The source value must be set to the path in the Github repo, If it is differnt than the default Github build artifacts path. By default, the source value is set to default path of Github build artficats downloaded in the workflow.
-  The destination value must be set to the path By default, the destination value 
+#### customizer-source 
+These values are required only if customizer type is declared as Shell or PowerShell. 
+If the customizer-type is Shell or PowerShell, then the value must be set to the URI for customizer scripts where the URI is   publically accessible 
+If the customizer-type is File, source value is set to the path (file/directory) in the Github repo, if it is differnt than the default Github build artifacts path. By default, the source value is set to default path of Github build artficats downloaded by workflow.
 
-#### customizer-windows-Update (optional)
+If the customizer-type is Inline, you can enter inline commands separated by commas.
+#### customizer-destination
+These values are required only if customizer type is declared as Shell or PowerShell or File.  The input is optional and set to default values depending on the OS of Image.
+* Windows
+By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
+
+* Linux
+By default, the customer scripts or files are placed in a path relative to '/tmp' directory. however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted. So if you need these customizer scripts or files to exist in the image, you must provide the absolute path so that the Github action will copy the scripts or files or directories. for example:
+
+#### customizer-windows-Update (optional for Windows only)
  The value is boolean and set to 'false' by default. This value is for Windows images only, the image builder will run Windows Update at the end of the customizations and also handle the reboots it requires.
 
   Windows Update configuration is executed to install important and recommended Windows Updates, that are not preview:
@@ -140,120 +147,43 @@ This action has been designed to inject Github Build artifacts into the image. T
         "exclude:$_.Title -like '*Preview*'",
         "include:$true"
 ```
-#### Build Path
-This task has been initially designed to be able to inject DevOps Build release artifacts into the image. To make this work, you will need to setup a Build Pipeline, and in the setup of the Release pipeline, you must add specific the repo of the build artifacts.
-
-![alt text](./step4.PNG "Add an Artifact")
-
-Click on the Build Path button, to select the build folder you want to be placed on the image. The Image Builder task will copy all files and directories underneath it. 
-
-When the image is being created, Image Builder will deploy them into different paths, depending on OS.
-
->> Note!!!
-When adding a Repo artifact, you may find the directory is prefixed with'_', this can cause issues with the inline commands, use the appropriate quotes in the commands.
-
-Lets use this example to explain how this works:
-![alt text](./buildArtifacts.PNG "Add an Artifact")
-
-* Windows - 
-In the 'C:\\', a directory named 'buildArtifacts' will be created, with the webapp directory.
-
-* Linux - 
-In /tmp, the webapp directory will be created, with all files and directories, you MUST move the files from this directory, otherwise, they will be deleted.
-
-#### Inline Customization Script
-* Windows
-You can enter powershell inline commands separated by commas, and if you want to run a script in your build directory, you can use:
-```PowerShell
-& 'c:\buildArtifacts\webapp\webconfig.ps1'
-```
-
-* Linux
-On Linux systems the build artifacts are put into the '/tmp' directory, however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted, so if you want these to exist in the image, you must create another directory, and copy them over, for example:
-
-```bash
-sudo mkdir /lib/buildArtifacts
-sudo cp -r "/tmp/_ImageBuilding/webapp" /lib/buildArtifacts/.
-```
-
-If you are ok using the "/tmp" directory, then you can use the code below to execute the script.
-
-```bash
-# grant execute permissions to execute scripts
-sudo chmod +x "/tmp/_ImageBuilding/webapp/coreConfig.sh"
-echo "running script"
-sudo . "/tmp/AppsAndImageBuilderLinux/_WebApp/coreConfig.sh"
-```
-
-#### What happens to the build artifacts after the image build?
->> Note! Image Builder does not automatically remove the build artifacts, it is strongly suggested that you always have code to remove the build artifacts!
-
-* Windows - Image builder deploys files to the 'c:\buildArtifacts' directory, this is a persisted directory, and therefore you must remove the 'c:\buildArtifacts' directory, you can do this in your within the script you execute, for example:
-
-```PowerShell
-# Clean up buildArtifacts directory
-Remove-Item -Path "C:\buildArtifacts\*" -Force -Recurse
-
-# Delete the buildArtifacts directory
-Remove-Item -Path "C:\buildArtifacts" -Force 
-```
-
-* Linux - As previously mentioned, the build artifacts are put into thr '/tmp' directory, however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted, it is strongly suggested that you have code to remove the contents, and not rely on the OS to remove the contents:
-
-```bash
-sudo rm -R "/tmp/AppsAndImageBuilderLinux"
-```
-
-#### Total length of image build
-This cannot be changed in the DevOps pipeline task yet, so it uses the default of 240mins. If you want to increase the '[buildTimeoutInMinutes](https://github.com/danielsollondon/azvmimagebuilder/blob/2834d0fcbc3e0a004b247f24692b64f6ef661dac/quickquickstarts/0_Creating_a_Custom_Windows_Managed_Image/helloImageTemplateWin.json#L12)', then you can use an AZ CLI task in the Release Pipeline, and configure this to copy down a template, and submit it, doing something similar to this [solution](https://github.com/danielsollondon/azvmimagebuilder/tree/master/solutions/4_Using_ENV_Variables#using-environment-variables-and-parameters-with-image-builder).
-
-
-#### Storage Account
-Select the storage account you created in the prereqs, if you do not see it in the list, Image Builder does not have permissions to it.
-
-When the build starts, Image Builder will create a container called 'imagebuilder-vststask', this is where the build artifacts from the repo are stored.
-
-Note!! You need to manually delete the storage account or container after each build!!! 
-
-### Distribute
-There are 3 distribute types supported:
-* Managed Image
-    * ResourceID:
+### Distributor Inputs
+After the Image Builder builds the image, it can be distributed in different formats in different Azure regions. The Github action requires the following inputs to determine the same so that the image can be distributed. The Github action can distribute the image to one of three types of distributors supported in a single Run.
+#### distributor-type:
+There are 3 distributor types supported by this Github actionn namely  ManagedImage | SharedGalleryImage | VHD.
+By default, the distributor type is set to ManagedImage.
+#### dist-resource-id & dist-location: (manadatory)
+* Managed Image ResourceID:
     ```bash
     /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
-    ```
-    * Locations
+   
+    dist-location - set to one of the Azure region to which the Managed image needs to be distributed. 
+    ```   
 * Azure Shared Image Gallery - this MUST already exist!  
     * ResourceID: 
     ```bash
     /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>
-    ```
-    * Regions: list of regions, comma separated, e.g. westus, eastus, centralus
+     
+     dist-location - set to one or more  Azure regions to which the shared gallery image needs to be distributed.
+      * dist-location : list of regions, comma separated, e.g. westus, eastus, centralus
+      ```
 * VHD
-    * You cannot pass any values to this, Image Builder will emit the VHD to the temporary Image Builder resource group, ‘'IT_<DestinationResourceGroup>_<TemplateName>', in the 'vhds' container. When you start the release build, image builder will emit logs, and when it has finished, it will emit the VHD URL.
+    * You cannot pass any values to this, Image Builder will create the VHD and the Github action will emit the resource id of VHD as output variable. 
 
-### Optional Settings
+
+### Optional Settings (to be defined)
 * [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default of *Standard_D1_v2*. You may do this to reduce total customization time, or because you want to create the images that depend on certain VM sizes, such as GPU / HPC etc.
 
 ## How it works
-When you create the release, the task will:
-1) Create a container in the storage account, named 'imagebuilder-vststask', it will zip and upload your build artifacts, and create a SAS Token on the that zip file.
-2) Use the properties passed to the task, to create the Image Builder Template artifact, this will in turn:
-    * Download the build artifact zip file, and any other associated scripts, and these are all saved in a storage account in the temporary Image Builder resource group, ‘'IT_<DestinationResourceGroup>_<TemplateName>'.
-    * Create a template prefixed 't_' 10 digit monotonic integer, this is saved to your Resource Group you selected, you will see it for the duration of the build in the resource group. 
-You can see the output in the 
-```bash
-start reading task parameters...
-found build at:  /home/vsts/work/r1/a/_ImageBuilding/webapp
-end reading parameters
-getting storage account details for aibstordot1556933914
-created archive /home/vsts/work/_temp/temp_web_package_21475337782320203.zip
-Source for image:  { type: 'SharedImageVersion',
-  imageVersionId: '/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>/versions/<imgVersionNumber>' }
-template name:  t_1556938436xxx
-starting put template...
-```
-3) Start the image build, when this happens, you will see this in the release logs, whilst the build is running:
+When you create the release workflow with a step or job that includes this Github action, it will:
+1) Creates the Resource Group, distributor Resources and other input defaults, if does not exist already. 
+2) Creates a container in the storage account, named 'imagebuilder-githubaction', it will zip and upload your build artifacts or customizer scripts from the github Repo, and create a SAS Token on the that zip file. 
+3) Using the inputs values passed to the action or the default values defined by action, the Github action creates Builder Template resource, which will in include:
+    * Create a template prefixed 't_<ResourceGroup>_<os-type>' 10 digit monotonic integer, if the imagebuilder-template-name is not set.  
+    * Adding additional inLine customizers to move the build artifacts from default location to the customizer-destination on the image 
+4) It then runs the Image Builder process, which will perform
+    * The Image builder creates a temporary resource group with ‘'IT_<resource-group-name>_<imagebuilder-template-name>_xxxxxxxxxx' 10 digit monotonic integer. 
+    * Creates a storage account in the above temporary resource group, transfers the artifacts zip or scripts to a container named 'shell'. Saves the packerizer details and the logs into different containers in the same storage acocunt. During the image builder run, you will see this in the release logs, whilst the build is running:
 ```bash
 starting run template...
 ```
@@ -264,16 +194,16 @@ starting run template...
 2019-05-06T13:36:33.8867768Z getting runOutput for  SharedImage_distribute
 2019-05-06T13:36:34.6652541Z ==============================================================================
 2019-05-06T13:36:34.6652925Z ## task output variables ##
-2019-05-06T13:36:34.6658728Z $(imageUri) =  /subscriptions/<subscriptionID>/resourceGroups/aibwinsig/providers/Microsoft.Compute/galleries/my22stSIG/images/winWAppimages/versions/0.23760.13763
+2019-05-06T13:36:34.6658728Z $(imageUri) =  /subscriptions/<subscriptionID>/resourceGroups/aibwinsig/providers/Microsoft.Compute/galleries/<XXsig>/images/<imagename>/versions/0.23760.13763
 2019-05-06T13:36:34.6659989Z ==============================================================================
 2019-05-06T13:36:34.6663500Z deleting template t_1557146959485...
 2019-05-06T13:36:34.6673713Z deleting storage blob imagebuilder-vststask\webapp/18-1/webapp_1557146958741.zip
 2019-05-06T13:36:34.9786039Z blob imagebuilder-vststask\webapp/18-1/webapp_1557146958741.zip is deleted
 2019-05-06T13:38:37.4884068Z delete template:  Succeeded
 ```
-The image template, and ‘'IT_<DestinationResourceGroup>_<TemplateName>' will be deleted.
+The image template resource, and ‘'IT_<DestinationResourceGroup>_<TemplateName>' will be deleted.
 
-You can take the '$(imageUri)' VSTS variable and use this in the next task, or just take its value and build a VM.
+5. Github action emits output varaibles listed below. You can take the '$(artifactsUri)'variable for use in the next task, or just take its value and build a VM.
 
 ## Output DevOps Variables
 * Pub/offer/SKU/Version of the source marketplace image:
