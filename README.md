@@ -115,9 +115,9 @@ The value of source-image must be set to one of the supported Image Builder OS's
 
 In the Initial version of Github action,  we are supporting only one customizer which can be any of the four customizer types supported by Azure Image Builder ( Shell | PowerShell | InLine | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
 
-Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer and run to customize the image.
+Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer to the Azure image and run to customize the image.
 
-Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image. To make this work, the workflow need to download the artifacts using actions/download-artifacts@v1, and in the setup of the Release pipeline, you must add specifics of the repo of the build artifacts.
+Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image. To make this work, the workflow needs to download the artifacts prior to using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable. Please note that this Github action adds the customer to inject the build artifacts as the fist one in the list of customizers so that the artifacts are made available for the user defined customizer to perform additional customizations.
 
 #### customizer-type (optional)
   The value must be set to one of the ' Shell | PowerShell | InLine | File '.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
