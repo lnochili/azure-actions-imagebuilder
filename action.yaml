@@ -23,7 +23,7 @@ inputs:
     description: 'Source image type'
     required: false # input type: string
     default: 'PlatformImage'
-  source-os-type: #mandatory 
+  source-os-type: #mandatory  possible values: [ linux | Windows ]
     description: 'Source OS type'
     required: true # input type: stringrequired: string
   source-image: #mandatory 
