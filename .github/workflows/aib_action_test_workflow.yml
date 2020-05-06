@@ -21,15 +21,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-#Image builder action with minimal inputs to build custom linux image as Managed Image  
+#Image builder action with minimal inputs to build custom linux image as VHD from Managed Image
       - name: 'Test Github action for Azure Image builder'
         uses: azure/azureimagebuilder@v0
         with:
           resource-group-name: 'iblinuxgalleryrg'
-          source-image: 'Ubuntu:Canonical:18.04-LTS:latest'
-          source-os-type:: 'linux'
-          customizer-source:: $GITHUB_WORKSPACE/src
+          location: 'westcentralus'
+          source-image: '/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/images/imageName'
+          source-image-type: 'ManagedImage' 
+          source-os-type:: 'Windows'
+          customizer-source:: $GITHUB_WORKSPACE/src/install.ps1
           customizer-destination: /var/www/myapp
+          customizer-windows-update: 'true'
+          dist-type: 'VHD'
           
 #Image builder action complete to build custom linux image with build artifacts in the image        
       - name: 'echo Image URI if Image builder step succeeded'
