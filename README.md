@@ -199,7 +199,7 @@ This value of this output will be the value of Image builder Run status set to e
 #### run-output-name:
 Upon completion of the action, The action emits output value run-output-name which can be used to get the details of the Image Builder Run.  The run-output-name can also be used to query and get more details of run, namely artifactsURI.
 
-#### output-image-uri: 
+#### custom-image-uri: 
 Upon successful completion, The github action emits the URI or resource id of the Image distributed.  
 
 #### webhook-uri: 
@@ -234,17 +234,18 @@ starting run template...
 2019-05-06T13:36:34.9786039Z blob imagebuilder-vststask\webapp/18-1/webapp_1557146958741.zip is deleted
 2019-05-06T13:38:37.4884068Z delete template:  Succeeded
 ```
-The image template resource, and ‘'IT_<DestinationResourceGroup>_<TemplateName>' will be deleted.
+The image builder template resource, and ‘'IT_<DestinationResourceGroup>_<TemplateName>_XXXXXXXXX' will be deleted.
 
 5. when the Github action is run with nowait-mode set to 'false, it emits output varaibles listed below in the Outputs section upon completion of Image builder action. The $(output-image-Uri)' output variable can be used in the next task, or just take its value and build a VM.
 6. If the Github action was run with 'nowait-mode' input set to 'true', The Image builder process will be run in asynchronous mode and returns a webhook URL which can be queried to get the status of Image builder run and the output variables upon completion of the image build. 
 
 ## How to Use this Github action
-Here are the examples of how to use this Github action for Azure Image Builder with different inputs:
+Here are few examples of how to use this Github action for Azure Image Builder with different inputs:
 
 ### Github action with ARM template as input
 
-The below example will take the ARM template as input for Image Builder, and creates an Managed Image in the west central US region. 
+The below example will take the ARM template as input for Image Builder, and creates an Managed Image in the west central US region. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory.
+
 ```#workflow using Image builder Action
 jobs:
   custom-image-uri: ""
@@ -256,27 +257,81 @@ jobs:
           resource-group-name: 'aib_example_rg'
           location: 'westcentralus'
           image-builder-template-name: $GITHUB_WORKSPACE/Imagebuildertemplate.json
-          
-#Image builder action complete to build custom linux image with build artifacts in the image        
+#Check and access the custom image         
       - name: 'echo Image URI if Image builder step succeeded'
-          #Persist the output of run
-        if: ${{ success() }}
+        #Persist the output of run
+        if: ${{ job-image-builder.outputs.imagebuilder-run-status }} 
         run: 
-         cutom-image-uri=outputs.artifacts-uri
+         cutom-image-uri= ${{ job-image-builder.outputs.custom-image-uri }}
          echo $cusom-image-uri
-#Image builder action with minimal inputs to build a custom linux image and distribute it as Managed Image  
-      - name: 'Test Github action for Azure Image builder'
+```
+
+### Github action to publish custom image to Shared Image Gallery
+
+The below example with minimal inputs, publishes theimage to Shared Imag Gallery with image versions in the westcentral US & west US2  regions. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory.
+```
+name: Azure workflow test sample
+on:
+  push:
+    paths: 
+      - master 
+     # [ .github/workflows/aib_action_test_workflow.yml ]
+#workflow using Image builder Action which takes Managed Image as source and Shared image gallery as distributor
+jobs:
+  custom-image-uri: ""
+  job_1:
+    name: Azure Image builder run 
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Github Action'
+        uses: actions/checkout@master   
+      - name: 'Download build artifacts'
+        uses: actions/download-artifacts@v2
+      - name: azure authentication
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+#Image builder action with minimal inputs to build custom linux image as Managed Image  
+      - name: 'Test Github action for Azure Image builder with Managed Image as Source'
         uses: azure/azureimagebuilder@v0
         with:
-          resource-group-name: 'aib_example_rg'
-          image-builder-template-name: $GITHUB_WORKSPACE/PlatformImageTemplate-UbuntuLinuxCanonical.json          
-#Image builder action complete to build custom linux image with build artifacts in the image        
+          resource-group-name: 'iblinuxgalleryrg'
+          location: 'westus2'
+          source-image: 'Ubuntu:Canonical:18.04-LTS:latest'
+          source-os-type:: 'linux'
+          source-image-type: 'ManagedImage'
+          customizer-source:: $GITHUB_WORKSPACE/src/install.sh
+          customizer-destination: /var/www/myapp
+          imagebuilder-template-name: aib_managed_image_template
+          build-timeout-in-minutes: 20 
+   ########Distributor details #############
+          dist-type: SharedGalleryImage  
+          dist-resource-id: '/subscriptions/xxxxx-xxxx-xxxx/resourceGroups/XXX-SharedImageRG//providers/Microsoft.Compute/images/aib_linux_shared'
+          dis-location: westus2, westcentralus
+          runoutput-name: 'aib_sig_linux.ub18.04'
+          artifactTags: "github-example: sig-distributor"
+ 
+#Image builder action complete to build custom linux image with build artifacts with a ManagedImage as the source        
       - name: 'echo Image URI if Image builder step succeeded'
-          #Persist the output of run
+          #Persist the output of previous step
         if: ${{ success() }}
         run: 
-         cutom-image-uri=outputs.artifacts-uri
+         custom-image-uri = ${{ job_1.outputs.custom-image-uri }}
          echo $cusom-image-uri
+ ```
+ 
+
+### Github action to build custom image of Windows OS from a ManagedImage 
+The below example with minimal inputs, creates a custom image of Windows OS from an existing Managed Image as base image, creates a VHD in the same region as the image builder. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory. After customising the image, it also updates with latest Windows updates excluing the ones that are in Preview. The output of this action run will set the custom image URI to the VHD in Azure Storage account. 
+
+```
+name: Azure workflow test sample
+on:
+  push:
+    paths: 
+      - master 
+     # [ .github/workflows/aib_action_test_workflow.yml ]
 #workflow using Image builder Action
 jobs:
   custom-image-uri: ""
@@ -285,54 +340,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout Github Action'
-        uses: actions/checkout@master    
-      - name: azure authentication
+        uses: actions/checkout@master   
+      - name: 'Download build artifacts'
+        uses: actions/download-artifacts@v2
+      - name: 'azure authentication'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-#Image builder action with minimal inputs to build custom linux image as Managed Image  
+#Image builder action with minimal inputs to build custom linux image as VHD from Managed Image
       - name: 'Test Github action for Azure Image builder'
         uses: azure/azureimagebuilder@v0
         with:
-          resource-group-name: 'aib_example_rg'
-          image-builder-template-name: $GITHUB_WORKSPACE/PlatformImageTemplate-UbuntuLinuxCanonical.json         
+          resource-group-name: 'iblinuxgalleryrg'
+          location: 'westcentralus'
+          source-image: '/subscriptions/subscriptionId/resourceGroups/resourceGroupName/providers/Microsoft.Compute/images/imageName'
+          source-image-type: 'ManagedImage' 
+          source-os-type:: 'Windows'
+          customizer-source:: $GITHUB_WORKSPACE/src/install.ps1
+          customizer-destination: /var/www/myapp
+          customizer-windows-update: 'true'
+          dist-type: 'VHD'
+          
 #Image builder action complete to build custom linux image with build artifacts in the image        
       - name: 'echo Image URI if Image builder step succeeded'
           #Persist the output of run
         if: ${{ success() }}
         run: 
-         cutom-image-uri=outputs.artifacts-uri
+         cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
          echo $cusom-image-uri
-```
+ ```
 
-## FAQ
-1. Can i use an existing image template i have already created, outside of DevOps?
-No, but stay tuned!!
-
-2. Can i specifiy the image template name?
-No, we generate a unique template name, then destroy it after.
-
-3. The image builder failed, how can i troubleshoot?
-* If there is a build failure the DevOps task will not delete the staging resource group, this is so you can access the staging resource group, that contains the build customization log.
-* You will see an error in the DevOps Log for the VM Image Builder task, and see the customization.log location, as per below:
-![alt text](./devOpsTaskError.png "devOps Error")
-* Review the [troubleshooting guide](https://github.com/danielsollondon/azvmimagebuilder/blob/master/troubleshootingaib.md) to see common issues and resolutions. 
-* After investigating the failure, to delete the staging resource group, delete the Image Template Resource artifact, this is prefixed with 't_', and can be found in the DevOps task build log:
-
-```text
-...
-Source for image:  { type: 'SharedImageVersion',
-  imageVersionId: '/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>/versions/<imgVersionNumber>' }
-...
-template name:  t_1556938436xxx
-...
-```
-The Image Template Resource artifact will be in the resource group specified initially in the task, you just need to delete it. Note, if deleting via the Azure Portal, when in the resource group, select 'Show Hidden Types', to view the artifact.
-
-* If you still see issues, raise a GitHub issue here.
-
-## Next Steps
-If you loved or hated Image Builder, please go to next steps to leave feedback, contact dev team, more documentation, or try more examples [here](../../quickquickstarts/nextSteps.md)]
 
 
