@@ -5,6 +5,7 @@ Current action version: v0
 This action is designed to take your build artifacts, and inject them into a VM image, so you can install, configure your application, and OS.
  
 ## Using the Github Action for Azure VM Image Builder
+currently in development.. once developed, you may
 --- Visit https://github.com/marketplace 
 --- Add the action for Azure VM Image Builder
  
