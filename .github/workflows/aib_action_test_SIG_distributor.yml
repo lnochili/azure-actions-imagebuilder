@@ -26,29 +26,27 @@ jobs:
         uses: azure/azureimagebuilder@v0
         with:
           resource-group-name: 'iblinuxgalleryrg'
+          location: 'westus2'
           source-image: 'Ubuntu:Canonical:18.04-LTS:latest'
           source-os-type:: 'linux'
-          customizer-source:: $GITHUB_WORKSPACE/src
+          source-image-type: 'ManagedImage'
+          customizer-source:: $GITHUB_WORKSPACE/src/install.sh
           customizer-destination: /var/www/myapp
           imagebuilder-template-name: aib_managed_image_template
-          build-timeout-in-minutes: 60 
-          image-type: 'ManagedImage'
-          source-image: "/subscriptions/xxxxx-xxxx-xxxx/resourceGroups/XXX-ManagedImageRG/providers/Microsoft.Compute/images/aib_linux-image"
-          customizer-source: $GITHUB_WORKSPACE/src 
-          customizer-detination: "/tmp/src"
+          build-timeout-in-minutes: 20 
    ########Distributor details #############
-          distributor-type: SharedImage  
-          sig-image-definition: '/subscriptions/xxxxx-xxxx-xxxx/resourceGroups/XXX-SharedImageRG//providers/Microsoft.Compute/images/aib_linux_shared'
-          sig-location: westcentralus
-          sig-runoutput-name: 'aib_sig_linux.ub18.04'
-          artifactTags: ManagedImageSource: $source-image
+          dist-type: SharedGalleryImage  
+          dist-resource-id: '/subscriptions/xxxxx-xxxx-xxxx/resourceGroups/XXX-SharedImageRG//providers/Microsoft.Compute/images/aib_linux_shared'
+          dis-location: westus2, westcentralus
+          runoutput-name: 'aib_sig_linux.ub18.04'
+          artifactTags: "github-example: sig-distributor"
  
 #Image builder action complete to build custom linux image with build artifacts with a ManagedImage as the source        
       - name: 'echo Image URI if Image builder step succeeded'
-          #Persist the output of run
+          #Persist the output of previous step
         if: ${{ success() }}
         run: 
-         cutom-image-uri=outputs.artifacts-uri
+         custom-image-uri = ${{ job_1.outputs.custom-image-uri }}
          echo $cusom-image-uri
             
           
