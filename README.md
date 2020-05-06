@@ -1,15 +1,15 @@
 # Github Action for Azure VM Image Builder  
 Current action version: v0
 
-## V1 Design Purpose
-This action is designed to take your build artifacts, and inject them into a VM image, so you can install, configure your application, and OS.
+## V1 Design Proposal
+This action is designed to take the downloaded build artifacts, and inject them into the VM image and then run the user defined customizer that can install, configure your application and OS.
  
 ## Using the Github Action for Azure VM Image Builder
 currently in development.. once developed, you may
 --- Visit https://github.com/marketplace 
 --- Add the action for Azure VM Image Builder
  
-## Prereqs
+## Prerequisites
 * You must have access to a Github account or project, in which you have permissions to create a Github workflow 
 * You must have an Azure Subscription with contributor permission to Azure Resource Groups of the source image and distributor images  
 * Register and enable Azure features, as per below:
@@ -18,13 +18,13 @@ currently in development.. once developed, you may
 az feature register --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview
 az feature show --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview | grep state
 ```
-# Register and enable for shared image gallery
+## Register and enable for shared image gallery
 
 ```az feature register --namespace Microsoft.Compute --name GalleryPreview ```
 
 Wait until it shows the feature state as "registered"
 
-# check if your subscription is registered for the providers
+## check if your subscription is registered for the providers
 ```az provider show -n Microsoft.VirtualMachineImages | grep registrationState
 az provider show -n Microsoft.Storage | grep registrationState
 az provider show -n Microsoft.Compute | grep registrationState
