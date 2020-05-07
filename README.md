@@ -198,10 +198,13 @@ This input value is optional and Github action applies default tags even if cust
  image-os: $source-os-type
  image-type: $image-type
  github-repo: 
- github-run-id:
- github-run-number:
+ github-workflow:$(github.workflow)
+ github-run-id: $(github.run_id)
+ github-run-number: $(github.run_number)
  github-run-url:
 ```
+link to github runner variables: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
+
 #### vm-profile ( Optional Settings)
 * [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC.
 
