@@ -1,11 +1,11 @@
 # Github Action for Azure VM Image Builder  
 Current action version: v0
 
-## V1 Design Proposal
+## V0 Design Proposal
 This actions aims at making it easier for customers to get started with the first step in the journey of VM deployments - creating custom VM images and distributing them. This action is designed to make it easier for customers to use Azure Image Builder service in CI/CD pipelines. It takes the artifacts the are built in a workflow, injects them into the base VM image and then runs the user defined customizer that can install, configure your application and OS while providing end to end traceability.
 
  
-## Prerequisites
+### Prerequisites
 * You must have access to a Github account or project, in which you have permissions to create a Github workflow 
 * You must have an Azure Subscription with contributor permission to Azure Resource Groups of the source image and distributor images  
 * Register and enable Azure features, as per below:
@@ -14,13 +14,13 @@ This actions aims at making it easier for customers to get started with the firs
 az feature register --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview
 az feature show --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview | grep state
 ```
-## Register and enable for shared image gallery
+#### Register and enable for shared image gallery (if used in action)
 
 ```az feature register --namespace Microsoft.Compute --name GalleryPreview ```
 
 Wait until it shows the feature state as "registered"
 
-## check if your subscription is registered for the providers
+#### Check if your subscription is registered for the providers
 ```az provider show -n Microsoft.VirtualMachineImages | grep registrationState
 az provider show -n Microsoft.Storage | grep registrationState
 az provider show -n Microsoft.Compute | grep registrationState
@@ -34,26 +34,17 @@ If shown not registered, run the commented out code below.
 ## az provider register -n Microsoft.Compute
 ## az provider register -n Microsoft.KeyVault
 ```
-```bash
-# create storage account and blob in resource group
-subscriptionID=<INSERT YOUR SUBSCRIPTION ID HERE>
-az account set -s $subscriptionID
-strResourceGroup=<ResourceGroupName>
-location=westus
-scriptStorageAcc=aibstordot$(date +'%s')
-az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location --sku Standard_LRS
-```
-## Create & configure the Github Workflow
-1. Configure the Github Secret with name 'AZURE_CREDENTIALS' that will be used access Azure Subscription
-2. Ensure that following github actions are added as steps to workflow that are to be run prior to running the action for Azure Image Builder
-3. If the build artifacts are to be injected to the custom image, download the artifacts of specific build pipeline
+### Assumptions
+We assume that prior to running the action for Azure Image Builder, the user would have 
+1. Logged into azure using [azure login action](https://github.com/Azure/login)
+2. Downloaded all required artifacts to the default current working directory potentially using [download artifact action](https://github.com/actions/download-artifact#download-artifact-v2)
 ```
       #Checkout action, if required
         - name: 'Checkout Github Action'
           uses: actions/checkout@master
       #Download the build artifacts
         - name: 'download build artifacts'
-          uses: actions/download-artifacts@v1
+          uses: actions/download-artifacts@v2
             with:
               name: example_azure_imagebuilder
       #Required Azure Authentiation Action
@@ -63,14 +54,14 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
               creds: ${{ secrets.AZURE_CREDENTIALS }}
       
  ```
-## Add the Github action for Azure Image Builder 
+## GitHub action for Azure Image Builder  
 The action begins now!!!
  
-### Define the inputs 
+### General Inputs 
  
 #### location (mandatory)
-This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. 
-so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image. The Github action needs location details as same source image might be present in more than one or all the Azure regions.
+This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. If the location is not from [supported regions](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-overview#regions), then action should throw error. 
+so for example, if you are using Shared Gallery Image or Managed Image as source image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image.  
 
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
@@ -79,7 +70,7 @@ The Azure region for the new resource group created will be set to the value of 
 
 #### imagebuilder-template-name (optional)
 The name of the image builder template resource to be used for creating and running the Image builder service. 
-This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number. The unique name of image builder template will  t_<ResourceGroup>_<os-type>_xxxxxxxx" where xxxxxxx will be a 10 digit random number. 
+This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number. The unique name of image builder template will be t_<ResourceGroup>_<os-type>_xxxxxxxx" where xxxxxxx will be a 10 digit random number. 
 
 * If the input value is a path to a file name with .JSON extension, No further inputs are required for the action. The Github Action will assume the ARM template as the source for all inputs and user has ensured the values comply to standard ARM template schema for azure image builder.
 * If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fails if imagebuilder template already exists. Currently, update/upgrade of image builder template is not supported and it requires to create a new image builder template whenever this action needs to run.
@@ -89,7 +80,11 @@ The value is boolean which is used to determine whether to run the Image builder
   
 #### build-timeout-in-minutes (optional)
 The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
-  
+
+#### vm-profile ( Optional Settings)
+* [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC.
+
+### Source Inputs
 #### source-image-type (optional)   
 The source image type that is being used for creating the custom image and should be set to one of three types supported:
 [ PlatformImage | SharedGalleryImage | ManagedImage ] 
@@ -115,7 +110,7 @@ The value of source-image must be set to one of the Operating systems supported 
 ```
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
-### Customizer details
+### Customizer Inputs
 
 In the Initial version of Github action,  we are supporting only one customizer which can be any of the four customizer types supported by Azure Image Builder [ Shell | PowerShell | InLine | File ]. Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
 
@@ -204,10 +199,9 @@ This input value is optional and Github action applies default tags even if cust
  image-os: $source-os-type
  image-type: $image-type
 ```
-#### vm-profile ( Optional Settings)
-* [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC.
 
-### Output Details:
+
+### Action Outputs:
 This Github action emits a set  of outputs the following outputs are set by the IB Action so that it can be used by the subsequent actions 
 
 #### imagebuilder-run-status: 
@@ -237,7 +231,7 @@ When you create the release workflow with a step or job that includes this Githu
 ```bash
 starting run template...
 ```
-4) When the image build completes you will see the following:
+5) When the image build completes you will see the following:
 ```bash
 2019-05-06T12:49:52.0558229Z starting run template...
 2019-05-06T13:36:33.8863094Z run template:  Succeeded
@@ -253,17 +247,18 @@ starting run template...
 ```
 The image builder template resource, and ‘'IT_<DestinationResourceGroup>_<TemplateName>_XXXXXXXXX' will be deleted.
 
-5. when the Github action is run with nowait-mode set to 'false, it emits output varaibles listed below in the Outputs section upon completion of Image builder action. The $(output-image-Uri)' output variable can be used in the next task, or just take its value and build a VM.
-6. If the Github action was run with 'nowait-mode' input set to 'true', The Image builder process will be run in asynchronous mode and returns a webhook URL which can be queried to get the status of Image builder run and the output variables upon completion of the image build. 
+6. when the Github action is run with nowait-mode set to 'false, it emits output varaibles listed below in the Outputs section upon completion of Image builder action. The $(output-image-Uri)' output variable can be used in the next task, or just take its value and build a VM.
+7. If the Github action was run with 'nowait-mode' input set to 'true', The Image builder process will be run in asynchronous mode and returns a webhook URL which can be queried to get the status of Image builder run and the output variables upon completion of the image build. 
 
 ## How to Use this Github action
-Here are few examples of how to use this Github action for Azure Image Builder with different inputs:
+Here are few examples of how to use this Github action for Azure Image Builder with different input values.
 
 ### Github action with ARM template as input
 
 The below example will take the ARM template as input for Image Builder, and creates an Managed Image in the west central US region. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory.
 
-```#workflow using Image builder Action
+```
+#workflow using Image builder Action with ARM template
 jobs:
   custom-image-uri: ""
   - job-image-builder :
@@ -279,15 +274,15 @@ jobs:
         #Persist the output of run
         if: ${{ job-image-builder.outputs.imagebuilder-run-status }} 
         run: 
-         cutom-image-uri= ${{ job-image-builder.outputs.custom-image-uri }}
-         echo $cusom-image-uri
+          cutom-image-uri= ${{ job-image-builder.outputs.custom-image-uri }}
+          echo $cusom-image-uri
 ```
 
 ### Github action to publish custom image to Shared Image Gallery
 
 The below example with minimal inputs, publishes theimage to Shared Imag Gallery with image versions in the westcentral US & west US2  regions. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory.
 ```
-name: Azure workflow test sample
+name: Azure workflow to push custom image to Shared gallery
 on:
   push:
     paths: 
@@ -334,8 +329,8 @@ jobs:
           #Persist the output of previous step
         if: ${{ success() }}
         run: 
-         custom-image-uri = ${{ job_1.outputs.custom-image-uri }}
-         echo $cusom-image-uri
+          custom-image-uri = ${{ job_1.outputs.custom-image-uri }}
+          echo $cusom-image-uri
  ```
  
 
@@ -384,12 +379,12 @@ jobs:
           #Persist the output of run
         if: ${{ success() }}
         run: 
-         cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
-         echo $cusom-image-uri
+          cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
+          echo $cusom-image-uri
  ```
 
 ### Github action to build custom image of Windows OS from a Shared Gallery Image
-The below example with minimal inputs, creates a custom image of Windows OS from an existing Shared Gallery Image version as the base image, creates a new image version in Shared Image Gallery and replicates the image into the regions westcentralus and westus2. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory. After customising the image, it also updates with latest Windows updates excluing the ones that are in Preview. The output of this action run will set the custom image URI to the VHD in Azure Storage account. 
+The below example workflow with this Github action for azure image builder, creates a custom image of Windows OS taking an existing Shared Gallery Image version as the source image. The below workflow creates a new image version in Shared Image Gallery and replicates the shared gallery image into the regions westcentralus and westus2. This workflow also injects the artifacts downloaded ( if any ), in to the custom image under /tmp directory. After customising the image, it also updates with latest Windows updates excluing the ones that are in Preview. The output of this action run will set the custom image URI to the VHD in Azure Storage account. 
 ```
 name: Azure workflow test sample
 on:
@@ -433,6 +428,6 @@ jobs:
           #Persist the output of run
         if: ${{ success() }}
         run: 
-         cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
-         echo $cusom-image-uri
+          cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
+          echo $cusom-image-uri
 ```
