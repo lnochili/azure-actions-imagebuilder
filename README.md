@@ -85,8 +85,8 @@ The action begins now!!!
 This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. If the location is not from [supported regions](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-overview#regions), then action should throw error. 
 
 #### resource-group-name (optional)
-This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resource Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
-so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in that Azure region.  This value is mandatory as the market place images (platform images) are available in all the regions.
+This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resource Group.  The Action will create a new Resource Group and run the Image Builder service.
+Note that if you are using Shared Gallery Image or Managed Image, the image(or a replica) must exist in same Azure region.  This value is not applicable for marketplace images (platform images) are they are available in all the regions.
 
 #### imagebuilder-template-name (optional)
   The name of the image builder template resource to be used for creating and running the Image builder service. 
@@ -123,19 +123,19 @@ The value of source-image must be set to one of the supported Image Builder OS's
 
 ### Customizer details
 
-In the Initial version of Github action,  we are supporting only one customizer which can be any of the four customizer types supported by Azure Image Builder ( Shell | PowerShell | InLine | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
+In the v0 version of Github action,  we will support only one customizer which can be any one of the four customizer types supported by Azure Image Builder ( Shell | PowerShell | InLine | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
 
 Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer to the Azure image and run to customize the image.
 
-Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image. To make this work, the workflow needs to download the artifacts prior to using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable. Please note that this Github action adds the customer to inject the build artifacts as the fist one in the list of customizers so that the artifacts are made available for the user defined customizer to perform additional customizations.
+Apart from the User specified customizer, this action has been designed to inject Github Build artifacts into the image. To make this work, the  action should persist the path to downloaded artifacts with an environment variable. Please note that this Github action adds the customer to inject the build artifacts as the fist one in the list of customizers so that the artifacts are made available for the user defined customizer to perform additional customizations.
 
 #### customizer-type (optional)
-  The value must be set to one of the ' Shell | PowerShell | InLine | File '.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
+  The value must be set to one of the 'Shell | PowerShell | InLine | File'.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
 
 #### customizer-source (optional)
 These values are required only if customizer type is declared as Shell or PowerShell. 
-If the customizer-type is Shell or PowerShell, then the value must be set to the URI for customizer scripts where the URI is   publically accessible 
-If the customizer-type is File, source value is set to the path (file/directory) in the Github repo, if it is differnt than the default Github build artifacts path. By default, the source value is set to default path of Github build artficats downloaded by workflow.
+If the customizer-type is Shell or PowerShell, then the value must be set to the URI for customizer scripts where the URI is accessible.
+If the customizer-type is File, by default, the customizer-source value is set to default path of Github build artficats(current working directory) downloaded by workflow. This can be overridden by customers to set the path to a file or directory in GitHub runner.
 
 If the customizer-type is Inline, you can enter inline commands separated by commas.
 #### customizer-destination (optional)
@@ -190,13 +190,17 @@ Image Builder Template can be created once and can be run many times to create S
 If the value is not set, this action will create unique run output id based on the image builder template and the Github Run Number of the action/workflow.
 
 #### dist-image-tags: (optional)
-The values set will be used to set the user defined tags on the custom image artifact created.  The user defined tag is set in the format for key:value pair.  If more than one tag is to be set, use comma to separate the tag values.
+The values set will be used to set the user defined tags on the custom image artifact created.  The user defined tag is set in the format for key:value pair.  If more than one tag is to be set, use comma to separate the tag values. 
 This input value is optional and Github action applies default tags even if customer does not provide values to this input.
 
 ```Default tags are:
  template-name: $imagebuilder-template-name
  image-os: $source-os-type
  image-type: $image-type
+ github-repo: 
+ github-run-id:
+ github-run-number:
+ github-run-url:
 ```
 #### vm-profile ( Optional Settings)
 * [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC.
