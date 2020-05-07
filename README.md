@@ -70,10 +70,12 @@ The action begins now!!!
  
 #### location (mandatory)
 This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. 
+so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in that Azure region.  This value is mandatory as the market place images (platform images) are available in all the regions.
 
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
-so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in that Azure region.  This value is mandatory as the market place images (platform images) are available in all the regions.
+The new Resource Group created will be unique which will be of the form : "rg_aib_action_XXXXXX" where xxxxx is a 5 digit random number.
+The Azure region for the new resource group created will be set to the value of input variable 'location'
 
 #### imagebuilder-template-name (optional)
   The name of the image builder template resource to be used for creating and running the Image builder service. 
@@ -93,7 +95,8 @@ so for example, if you are using Shared Gallery Image or Managed Image, the imag
   The input is optional and set to 'PlatformImage' by default, if the input value is provided.
 
 #### source-image (mandatory)
-The value of source-image must be set to one of the supported Image Builder OS's. Apart from the Platform images from Azure Market place, You can choose existing custom images in the same region as Image Builder is running.
+The value of source-image must be set to one of the supported Image Builder OS's. Apart from the Platform images from Azure Market place, You can choose existing custom images in the same region as Image Builder is running. This value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
+
  * If the image-type is PlatformImage, the value of source image will be the urn of image which is an output of 
  ```az vm image list   or az vm image show 
     format - { publisher:offer:sku:version } if Source Image Type is PlatformImage; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
@@ -105,6 +108,7 @@ The value of source-image must be set to one of the supported Image Builder OS's
 ```
 /subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
 ```
+
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
 ### Customizer details
