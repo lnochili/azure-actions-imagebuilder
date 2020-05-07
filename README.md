@@ -22,7 +22,7 @@ az feature show --namespace Microsoft.VirtualMachineImages --name VirtualMachine
 
 Wait until it shows the feature state as "registered"
 
-#### To check the registration state:
+#### Check the registration state of these services:
 ```bash
 
 az provider show -n Microsoft.VirtualMachineImages | grep registrationState
@@ -55,19 +55,20 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
 ```
 
 
-## Create & configure the Github Workflow
-1. Configure the Github Secret with name 'AZURE_CREDENTIALS' that will be used access Azure Subscription
-2. Ensure that following github actions are added as steps to workflow that are to be run prior to running the action for Azure Image Builder
-3. If the build artifacts are to be injected to the custom image, download the artifacts of specific build pipeline
-```
+## Assumptions
+We assume that prior to running the action for Azure Image Builder, the user would have 
+1. Logged into azure using [azure login action](https://github.com/Azure/login)
+2. Downloaded all required artifacts to the default current working directory potentially using [download artifact action](https://github.com/actions/download-artifact#download-artifact-v2)
+
+```yaml
       #Checkout action, if required
         - name: 'Checkout Github Action'
           uses: actions/checkout@master
       #Download the build artifacts
         - name: 'download build artifacts'
-          uses: actions/download-artifacts@v1
+          uses: actions/download-artifacts@v2
             with:
-              name: example_azure_imagebuilder
+              name:  binariesAndDeployScripts
       #Required Azure Authentiation Action
         - name: azure authentication
           uses: azure/login@v1
@@ -75,16 +76,16 @@ az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location
               creds: ${{ secrets.AZURE_CREDENTIALS }}
       
  ```
-## Add the Github action for Azure Image Builder 
+## GitHub action for Azure Image Builder 
 The action begins now!!!
  
-### Define the inputs 
+### The inputs 
  
 #### location (mandatory)
-This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. 
+This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. If the location is not from [supported regions](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-overview#regions), then action should throw error. 
 
 #### resource-group-name (optional)
-This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
+This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resource Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
 so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in that Azure region.  This value is mandatory as the market place images (platform images) are available in all the regions.
 
 #### imagebuilder-template-name (optional)
@@ -94,9 +95,10 @@ so for example, if you are using Shared Gallery Image or Managed Image, the imag
   If the input value is a simple string, it is used to create & run the Image builder template resource in Azure resource Group.
 
 #### nowait-mode (optional)
-  The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'
+  The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'.
+  In future versions, we intend to support a trigger functionality which would trigger another GitHub workflow when the image builder action completes.
   
-#### build-timeout-in-minutes (optional)
+#### timeout-in-minutes (optional)
   The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
   
 #### image-type (optional)   
