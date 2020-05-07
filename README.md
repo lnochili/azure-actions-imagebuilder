@@ -56,7 +56,8 @@ We assume that prior to running the action for Azure Image Builder, the user wou
  ```
 ## GitHub action for Azure Image Builder  
 The action begins now!!!
- 
+
+### Action Inputs
 ### General Inputs 
  
 #### location (mandatory)
