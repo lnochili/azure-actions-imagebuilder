@@ -70,7 +70,7 @@ The action begins now!!!
  
 #### location (mandatory)
 This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. 
-so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image. The Github action needs location details as same source image might be present in more than one or all the regions.
+so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image. The Github action needs location details as same source image might be present in more than one or all the Azure regions.
 
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
@@ -78,24 +78,24 @@ The new Resource Group created will be unique which will be of the form : "rg_ai
 The Azure region for the new resource group created will be set to the value of input variable 'location'
 
 #### imagebuilder-template-name (optional)
-  The name of the image builder template resource to be used for creating and running the Image builder service. 
-  This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number.
-  If the input value is a path or file name containing .JSON extension, no more inputs are required and the input value is considered as  the ARM Template file to be used. The Github Action will consider the ARM template as source for all inputs.
-  If the input value is a simple string, it is used to create & run the Image builder template resource in Azure resource Group.
+The name of the image builder template resource to be used for creating and running the Image builder service. 
+This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number. The unique name of image builder template will  t_<ResourceGroup>_<os-type>_xxxxxxxx" where xxxxxxx will be a 10 digit random number. 
+
+* If the input value is a path to a file name with .JSON extension, No further inputs are required for the action. The Github Action will assume the ARM template as the source for all inputs and user has ensured the values comply to standard ARM template schema for azure image builder.
+* If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fail, if imagebuilder template already exists..  
 
 #### nowait-mode (optional)
-  The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'
+The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'
   
 #### build-timeout-in-minutes (optional)
-  The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
+The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
   
 #### image-type (optional)   
-  The source image type that is being used for creating the custom image. Possible values:
-     PlatformImage or SharedGalleryImage or ManagedImage
-  The input is optional and set to 'PlatformImage' by default, if the input value is provided.
+The source image type that is being used for creating the custom image. Possible values: PlatformImage or SharedGalleryImage or ManagedImage
+The input is optional and set to 'PlatformImage' by default, if the input value is provided.
 
 #### source-image (mandatory)
-The value of source-image must be set to one of the supported Image Builder OS's. Apart from the Platform images from Azure Market place, You can choose existing custom images in the same region as Image Builder is running. This value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
+The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
 
  * If the image-type is PlatformImage, the value of source image will be the urn of image which is an output of 
  ```az vm image list   or az vm image show 
