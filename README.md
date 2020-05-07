@@ -145,11 +145,17 @@ The value is boolean and set to 'false' by default. This value is for Windows im
 
 Windows Update configuration is executed to install important and recommended Windows Updates, that are not preview:
 ```json
-    "type": "WindowsUpdate",
-    "searchCriteria": "IsInstalled=0",
-    "filters": [
-        "exclude:$_.Title -like '*Preview*'",
-        "include:$true"
+"customize": [
+        {
+            "type": "WindowsUpdate",
+            "searchCriteria": "IsInstalled=0",
+            "filters": [
+                "exclude:$_.Title -like '*Preview*'",
+                "include:$true"
+                        ],
+            "updateLimit": 20
+        }
+           ],
 ```
 ### Distributor Inputs
 After the Image Builder builds the image, the same can be distributed in different formats and in different Azure regions. The Github action requires the following inputs to determine the details so that the image can be distributed. This Github action shall distribute the image as one of the distributor types supported in a single Run.
@@ -162,21 +168,26 @@ The distributor-type determines the format in which the image is to be distribut
 By default, the value for distributor-type is set to ManagedImage.
 
 #### dist-resource-id & dist-location: (optional)
-Both these values are mandatory if the distributor type is Managed Image or SharedGalleryImage.  The value of dist-resource-id needs to be set as given below:
+* Both these values are mandatory if the distributor type is SharedGalleryImage. The dist-resource-id is used to create an image version under the image definition in Azure regions listed in dist-location.
 
+* For ManagedImage, dist-resource-id is used to create the Managed image resource with the imageName and the image will be created in the Azure region set in dist-location. If no value is provided, The value of dist-resource-id is set to a default image name (mi_ which will be unique in the Azure region set in dist-location.  
+
+The value of dist-resource-id needs to be set as given below:
 * Managed Image ResourceID:
     ```bash
     /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
    
     dist-location - westus2  #set to one of the Azure region to which the Managed image needs to be distributed. 
     ```   
-* Azure Shared Image Gallery - this MUST already exist!  
-    * ResourceID: 
+* Azure Shared Image Gallery ResourceID: 
+   The Image Gallery and the Image Definition must already exist and the ResourceID provided is an existing Azure Resource.
+   
     ```bash
     /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>
      
      dist-location - westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
-      ```
+     ```
+   
 * VHD
     * You cannot pass any values to this, Image Builder will create the VHD and the Github action will emit the resource id of VHD as output variable. 
 
