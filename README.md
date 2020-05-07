@@ -23,7 +23,9 @@ az feature show --namespace Microsoft.VirtualMachineImages --name VirtualMachine
 Wait until it shows the feature state as "registered"
 
 #### To check the registration state:
-```az provider show -n Microsoft.VirtualMachineImages | grep registrationState
+```bash
+
+az provider show -n Microsoft.VirtualMachineImages | grep registrationState
 az provider show -n Microsoft.Storage | grep registrationState
 az provider show -n Microsoft.Compute | grep registrationState
 az provider show -n Microsoft.KeyVault | grep registrationState
