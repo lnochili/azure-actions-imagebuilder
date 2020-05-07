@@ -75,7 +75,7 @@ so for example, if you are using Shared Gallery Image or Managed Image, the imag
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
 The new Resource Group created will be unique which will be of the form : "rg_aib_action_XXXXXX" where xxxxx is a 5 digit random number.
-The Azure region for the new resource group created will be set to the value of input variable 'location'
+The Azure region for the new resource group created will be set to the value of input variable 'location'.
 
 #### imagebuilder-template-name (optional)
 The name of the image builder template resource to be used for creating and running the Image builder service. 
@@ -90,12 +90,17 @@ The value is boolean which is used to determine whether to run the Image builder
 #### build-timeout-in-minutes (optional)
 The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
   
-#### image-type (optional)   
-The source image type that is being used for creating the custom image. Possible values: [ PlatformImage | SharedGalleryImage | ManagedImage ]
-The input is optional and set to 'PlatformImage' by default, if the input value is provided.
+#### source-image-type (optional)   
+The source image type that is being used for creating the custom image and should be set to one of three types supported:
+[ PlatformImage | SharedGalleryImage | ManagedImage ] 
+
+By default, The input is optional and is set to 'PlatformImage' type.
+
+#### source-os-type: (mandatory)
+The value is mandatory, which should be set to one of three types supported:  [ linux | Windows ]
 
 #### source-image (mandatory)
-The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
+The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose from existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
 
  * If the image-type is PlatformImage, the value of source image will be the urn of image which is an output of 
  ```az vm image list   or az vm image show 
@@ -108,7 +113,6 @@ The value of source-image must be set to one of the Operating systems supported 
 ```
 /subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
 ```
-
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
 ### Customizer details
@@ -123,14 +127,14 @@ Apart from the User specified customizer, This action has been designed to injec
 The value must be set to one of the [ Shell | PowerShell | InLine | File ].  This input is optional and defaults to Null.
 
 #### customizer-source (optional)
-These values are required only if customizer type is set to one of [ Shell | PowerShell | InLine | File ].
+This value is required only if customizer type is set to one of [ Shell | PowerShell | InLine | File ].
 If the customizer-type is Shell or PowerShell, then the value can be set either to the path in Github repor or to a publically accessible URI.  
 If the customizer-type is File, source value is set to the location of file/directory in the Github repo. 
 By default, the customizer-source value is set to default path of Github build artficats downloaded by workflow.
 If the customizer-type is Inline, you can enter inline commands separated by commas.
 
 #### customizer-destination (optional)
-These values are required only if customizer type is declared as Shell or PowerShell or File.  The input is optional and set to default values depending on the OS of Image.
+This value is required only if customizer type is declared as Shell or PowerShell or File.  The input is optional and set to a default value based on the Operating system type set in source-Os-type.
 * Windows
 By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
 * Linux
