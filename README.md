@@ -82,16 +82,16 @@ The name of the image builder template resource to be used for creating and runn
 This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number. The unique name of image builder template will  t_<ResourceGroup>_<os-type>_xxxxxxxx" where xxxxxxx will be a 10 digit random number. 
 
 * If the input value is a path to a file name with .JSON extension, No further inputs are required for the action. The Github Action will assume the ARM template as the source for all inputs and user has ensured the values comply to standard ARM template schema for azure image builder.
-* If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fail, if imagebuilder template already exists..  
+* If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fails if imagebuilder template already exists. Currently, update/upgrade of image builder template is not supported and it requires to create a new image builder template whenever this action needs to run.
 
 #### nowait-mode (optional)
-The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'
+The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'.
   
 #### build-timeout-in-minutes (optional)
 The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
   
 #### image-type (optional)   
-The source image type that is being used for creating the custom image. Possible values: PlatformImage or SharedGalleryImage or ManagedImage
+The source image type that is being used for creating the custom image. Possible values: [ PlatformImage | SharedGalleryImage | ManagedImage ]
 The input is optional and set to 'PlatformImage' by default, if the input value is provided.
 
 #### source-image (mandatory)
@@ -99,7 +99,7 @@ The value of source-image must be set to one of the Operating systems supported 
 
  * If the image-type is PlatformImage, the value of source image will be the urn of image which is an output of 
  ```az vm image list   or az vm image show 
-    format - { publisher:offer:sku:version } if Source Image Type is PlatformImage; Example:  {Ubuntu:Canonical:18.04-LTS:latest } 
+    format - [ "publisher:offer:sku:version" ] if Source Image Type is PlatformImage; Example:  [ "Ubuntu:Canonical:18.04-LTS:latest" ] 
  ```
  * if the image-type is Managed Image - You need to pass in the resourceId of the source image, for example:
 ```/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
@@ -113,21 +113,22 @@ The value of source-image must be set to one of the Operating systems supported 
 
 ### Customizer details
 
-In the Initial version of Github action,  we are supporting only one customizer which can be any of the four customizer types supported by Azure Image Builder ( Shell | PowerShell | InLine | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
+In the Initial version of Github action,  we are supporting only one customizer which can be any of the four customizer types supported by Azure Image Builder [ Shell | PowerShell | InLine | File ]. Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
 
 Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer to the Azure image and run to customize the image.
 
-Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image. To make this work, the workflow needs to download the artifacts prior to using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable. Please note that this Github action adds the customer to inject the build artifacts as the fist one in the list of customizers so that the artifacts are made available for the user defined customizer to perform additional customizations.
+Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image by adding required customizer. To injest of build artifacts into the custom image, the github workflow needs to download the artifacts prior using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable for use by this github action. Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
 
 #### customizer-type (optional)
-  The value must be set to one of the ' Shell | PowerShell | InLine | File '.  This input is optional and defaults to the type required to inject the build artifacts using the subsequent inputs on customizer.
+The value must be set to one of the [ Shell | PowerShell | InLine | File ].  This input is optional and defaults to Null.
 
 #### customizer-source (optional)
-These values are required only if customizer type is declared as Shell or PowerShell. 
-If the customizer-type is Shell or PowerShell, then the value must be set to the URI for customizer scripts where the URI is   publically accessible 
-If the customizer-type is File, source value is set to the path (file/directory) in the Github repo, if it is differnt than the default Github build artifacts path. By default, the source value is set to default path of Github build artficats downloaded by workflow.
-
+These values are required only if customizer type is set to one of [ Shell | PowerShell | InLine | File ].
+If the customizer-type is Shell or PowerShell, then the value can be set either to the path in Github repor or to a publically accessible URI.  
+If the customizer-type is File, source value is set to the location of file/directory in the Github repo. 
+By default, the customizer-source value is set to default path of Github build artficats downloaded by workflow.
 If the customizer-type is Inline, you can enter inline commands separated by commas.
+
 #### customizer-destination (optional)
 These values are required only if customizer type is declared as Shell or PowerShell or File.  The input is optional and set to default values depending on the OS of Image.
 * Windows
