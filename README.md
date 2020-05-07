@@ -70,7 +70,7 @@ The action begins now!!!
  
 #### location (mandatory)
 This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. 
-so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in that Azure region.  This value is mandatory as the market place images (platform images) are available in all the regions.
+so for example, if you are using Shared Gallery Image or Managed Image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image. The Github action needs location details as same source image might be present in more than one or all the regions.
 
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
