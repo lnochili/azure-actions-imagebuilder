@@ -2,12 +2,8 @@
 Current action version: v0
 
 ## V1 Design Proposal
-This action is designed to take the downloaded build artifacts, and inject them into the VM image and then run the user defined customizer that can install, configure your application and OS.
- 
-## Using the Github Action for Azure VM Image Builder
-currently in development.. once developed, you may
---- Visit https://github.com/marketplace 
---- Add the action for Azure VM Image Builder
+This actions aims at making it easier for customers to get started with the first step in the journey of VM deployments - creating custom VM images and distributing them. This action is designed to make it easier for customers to use Azure Image Builder service in CI/CD pipelines. It takes the artifacts the are built in a workflow, injects them into the base VM image and then runs the user defined customizer that can install, configure your application and OS while providing end to end traceability.
+
  
 ## Prerequisites
 * You must have access to a Github account or project, in which you have permissions to create a Github workflow 
