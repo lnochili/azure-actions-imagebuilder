@@ -8,19 +8,21 @@ This actions aims at making it easier for customers to get started with the firs
 ## Prerequisites
 * You must have access to a Github account or project, in which you have permissions to create a Github workflow 
 * You must have an Azure Subscription with contributor permission to Azure Resource Groups of the source image and distributor images  
-* Register and enable Azure features, as per below:
+
+## Register and enable associated Azure features before running action:
+#### Register and enable VirtualMachineTemplatePreview, as per below:
 
 ```bash
 az feature register --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview
 az feature show --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview | grep state
 ```
-## Register and enable for shared image gallery
+#### Register and enable for shared image gallery(if used in action)
 
 ```az feature register --namespace Microsoft.Compute --name GalleryPreview ```
 
 Wait until it shows the feature state as "registered"
 
-## check if your subscription is registered for the providers
+#### To check the registration state:
 ```az provider show -n Microsoft.VirtualMachineImages | grep registrationState
 az provider show -n Microsoft.Storage | grep registrationState
 az provider show -n Microsoft.Compute | grep registrationState
@@ -34,6 +36,12 @@ If shown not registered, run the commented out code below.
 ## az provider register -n Microsoft.Compute
 ## az provider register -n Microsoft.KeyVault
 ```
+
+
+#### Create storage account and blob in resource group. 
+
+This will be used internally by the action to transfer the build artifacts to the storage account. 
+
 ```bash
 # create storage account and blob in resource group
 subscriptionID=<INSERT YOUR SUBSCRIPTION ID HERE>
@@ -43,6 +51,8 @@ location=westus
 scriptStorageAcc=aibstordot$(date +'%s')
 az storage account create -n $scriptStorageAcc -g $strResourceGroup -l $location --sku Standard_LRS
 ```
+
+
 ## Create & configure the Github Workflow
 1. Configure the Github Secret with name 'AZURE_CREDENTIALS' that will be used access Azure Subscription
 2. Ensure that following github actions are added as steps to workflow that are to be run prior to running the action for Azure Image Builder
