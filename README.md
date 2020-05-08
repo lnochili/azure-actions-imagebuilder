@@ -39,7 +39,7 @@ If shown not registered, run the commented out code below.
 We assume that prior to running the action for Azure Image Builder, the user would have 
 1. Logged into azure using [azure login action](https://github.com/Azure/login)
 2. Downloaded all required artifacts to the default current working directory potentially using [download artifact action](https://github.com/actions/download-artifact#download-artifact-v2)
-```
+```yaml
       #Checkout action, if required
         - name: 'Checkout Github Action'
           uses: actions/checkout@master
@@ -259,7 +259,7 @@ Here are few examples of how to use this Github action for Azure Image Builder w
 
 The below example will take the ARM template as input for Image Builder, and creates an Managed Image in the west central US region. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory.
 
-```
+```yaml
 #workflow using Image builder Action with ARM template
 jobs:
   custom-image-uri: ""
@@ -283,7 +283,7 @@ jobs:
 ### Github action to publish custom image to Shared Image Gallery
 
 The below example with minimal inputs, publishes theimage to Shared Imag Gallery with image versions in the westcentral US & west US2  regions. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory.
-```
+```yaml
 name: Azure workflow to push custom image to Shared gallery
 on:
   push:
@@ -339,7 +339,7 @@ jobs:
 ### Github action to build custom image of Windows OS from a ManagedImage 
 The below example with minimal inputs, creates a custom image of Windows OS from an existing Managed Image as base image, creates a VHD in the same region as the image builder. This workflow also injects the artifacts downloaded ( if any ), to the custom image under /tmp directory. After customising the image, it also updates with latest Windows updates excluing the ones that are in Preview. The output of this action run will set the custom image URI to the VHD in Azure Storage account. 
 
-```
+```yaml
 name: Azure workflow test sample
 on:
   push:
@@ -387,7 +387,7 @@ jobs:
 
 ### Github action to build custom image of Windows OS from a Shared Gallery Image
 The below example workflow with this Github action for azure image builder, creates a custom image of Windows OS taking an existing Shared Gallery Image version as the source image. The below workflow creates a new image version in Shared Image Gallery and replicates the shared gallery image into the regions westcentralus and westus2. This workflow also injects the artifacts downloaded ( if any ), in to the custom image under /tmp directory. After customising the image, it also updates with latest Windows updates excluing the ones that are in Preview. The output of this action run will set the custom image URI to the VHD in Azure Storage account. 
-```
+```yaml
 name: Azure workflow test sample
 on:
   push:
