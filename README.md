@@ -2,7 +2,8 @@
 Current action version: v0
 
 ## V0 Design Proposal
-This actions aims at making it easier for customers to get started with the first step in the journey of VM deployments - creating custom VM images and distributing them. This action is designed to make it easier for customers to use Azure Image Builder service in CI/CD pipelines. It takes the artifacts the are built in a workflow, injects them into the base VM image and then runs the user defined customizer that can install, configure your application and OS while providing end to end traceability.
+This actions aims at making it easier for customers to get started with the first step in the journey of VM deployments - creating custom VM images and distributing them. This action is designed to make it easier for customers to use Azure Image Builder service in CI/CD pipelines. It takes the artifacts the are built in a workflow, injects them into the base VM image and then runs the user defined customizer that can install, configure your application and OS while providing end to end traceability. 
+<br>You can learn more about the enterprise scenarios, Azure Image Builder Service and other literature [here](https://microsoft-my.sharepoint.com/:w:/g/personal/lanochil_microsoft_com1/EUcpYCvGNR5Flyv58LpFoNcBGSTtnfqUW8yK7niO7zHk0w?CID=D26F4BF9-9C73-4488-880B-EA8477F98F01&wdLOR=c96D3495D-A4D0-4F20-8EA9-68B4D097277A)
 
  
 ### Prerequisites
