@@ -53,6 +53,7 @@ jobs:
         with:
           inlineScript: | 
             temp=`cat $GITHUB_WORKSPACE/aib_local/subscriptionId.out`
+            #### Code to update the template with subscriptionId, resourceGroup, region, Imagedefinition, etc.#####
             temp="${temp#\"}"
             subscriptionId="${temp%\"}"
             rgName=${{ env.distributor_resource_group }}
@@ -61,7 +62,7 @@ jobs:
             imgGalleryName=${{ env.image_gallery_name }}
             runOutputName=${{ env.run_output_name }}
             userTags=${{ env.version }}$runOutputName
-            curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
+            curl https://raw.githubusercontent.com/lnochili/azure-actions-imagebuilder/master/.github/workflows/PlatformImageTemplate-UbuntuLinuxCanonical.json -o ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<subscriptionID>/$subscriptionId/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<region>/$imgLocation/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<ImageDefName>/$imgDefName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
@@ -70,7 +71,8 @@ jobs:
             sed -i -e "s/<resourceGroupID>/$rgName/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             sed -i -e "s/<artfactTags>/$userTags/g" ./PlatformImageTemplate-UbuntuLinuxCanonical.json
             cat ./PlatformImageTemplate-UbuntuLinuxCanonical.json
-            ## az CLI for Azure image builder prepare and create template ##
+            
+            #### az CLI for Azure image builder create template in cach ####
             az image builder create --resource-group ${{ env.distributor_resource_group }} --image-template ./PlatformImageTemplate-UbuntuLinuxCanonical.json --name ${{ env.image_template_name }} --defer
             az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }}   --customizer-name ${{ env.customizer_name}} --type ${{ env.customizer_type }} --script-url ${{ env.customizer_scriptUri }} --defer
             az image builder  customizer add --resource-group ${{ env.distributor_resource_group }} -n ${{ env.image_template_name }}   --customizer-name "shell-script-inline" --type ${{ env.customizer_type }} --inline-script "hostname -a > hostname.out " --defer
