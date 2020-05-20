@@ -430,6 +430,6 @@ jobs:
           #Persist the output of run
         if: ${{ success() }}
         run: 
-          cutom-image-uri= ${{ job_1.outputs.custom-image-uri }}
-          echo $cusom-image-uri
+          custom-image-uri= ${{ job_1.outputs.custom-image-uri }}
+          echo $custom-image-uri
 ```
