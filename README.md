@@ -433,3 +433,34 @@ jobs:
           custom-image-uri= ${{ job_1.outputs.custom-image-uri }}
           echo $custom-image-uri
 ```
+
+### Create a VM from published Shared Gallery Image Gallery:
+
+Check the working github workflow here: [Deploy VM from SIG](https://github.com/raiyanalam/azureImageBuilderAction/blob/master/.github/workflows/create-vm-from-sig.yml)
+```
+ - name: Deploy Azure VM from Shared Image Gallery
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.0.72
+        inlineScript: |
+          az account show          
+          
+          
+          subscriptionID=afc11291-9826-46be-b852-70349146ddf8
+          sigResourceGroup=raiyan-rg2
+          sigName=rai_sig_eastus
+          imageDefName=rai_ubunut_packer_def
+          location=eastus
+          vmName=rai-vm-frm-sig
+          adminUsername=moala
+          adminPassword=${{ secrets.vm_pwd }}
+          az vm create \
+            --resource-group $sigResourceGroup \
+            --name $vmName \
+            --admin-username $adminUsername \
+            --location $location \
+            --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest" \
+            --admin-password $adminPassword \
+
+
+```
