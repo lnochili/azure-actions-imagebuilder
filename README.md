@@ -437,8 +437,9 @@ jobs:
 ### Create a VM from published Shared Gallery Image Gallery:
 
 Check the working github workflow here: [Deploy VM from SIG](https://github.com/raiyanalam/azureImageBuilderAction/blob/master/.github/workflows/create-vm-from-sig.yml)
-```
- - name: Deploy Azure VM from Shared Image Gallery
+
+```yaml
+    - name: Deploy Azure VM from Shared Image Gallery
       uses: azure/CLI@v1
       with:
         azcliversion: 2.0.72
