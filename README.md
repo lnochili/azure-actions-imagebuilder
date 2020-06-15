@@ -444,9 +444,7 @@ Check the working github workflow here: [Deploy VM from SIG](https://github.com/
       with:
         azcliversion: 2.0.72
         inlineScript: |
-          az account show          
-          
-          
+          az account show                   
           subscriptionID=afc11291-9826-46be-b852-70349146ddf8
           sigResourceGroup=raiyan-rg2
           sigName=rai_sig_eastus
@@ -464,4 +462,29 @@ Check the working github workflow here: [Deploy VM from SIG](https://github.com/
             --admin-password $adminPassword \
 
 
+```
+### Create a VMSS from published Shared Gallery Image Gallery:
+
+Check the working github workflow here: [Deploy VM from SIG]
+(https://github.com/raiyanalam/azureImageBuilderAction/blob/master/.github/workflows/create-new-vmss-from-sig.yml)
+
+```yaml
+  - name: Deploy Azure VM from Shared Image Gallery
+    uses: azure/CLI@v1
+    with:
+      azcliversion: 2.0.72
+      inlineScript: |
+        az account show         
+        subscriptionID=afc11291-9826-46be-b852-70349146ddf8          
+        sigResourceGroup=raiyan-rg2
+        sigName=rai_sig_eastus
+        imageDefName=rai_ubunut_packer_def
+        location=eastus
+        vmssName=rai-vmss-frm-sig
+        adminUsername=moala
+        adminPassword=${{ secrets.vm_pwd }}
+        az vmss create  --resource-group $sigResourceGroup --name $vmssName --instance-count 3 \
+            --image "/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/latest"  \
+            --admin-username $adminUsername  --location $location --admin-password $adminPassword
+            
 ```
