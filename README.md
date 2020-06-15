@@ -466,7 +466,7 @@ Check the working github workflow here: [Deploy VM from SIG](https://github.com/
 ### Create a VMSS from published Shared Gallery Image Gallery:
 
 Check the working github workflow here: 
-[Deploy VMS from SIG]: (https://github.com/raiyanalam/azureImageBuilderAction/blob/master/.github/workflows/create-new-vmss-from-sig.yml)
+[Deploy VMSS from SIG]: (https://github.com/raiyanalam/azureImageBuilderAction/blob/master/.github/workflows/create-new-vmss-from-sig.yml)
 
 ```yaml
   - name: Deploy Azure VM from Shared Image Gallery
