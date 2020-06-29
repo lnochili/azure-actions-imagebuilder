@@ -114,26 +114,27 @@ The value of source-image must be set to one of the Operating systems supported 
 ```
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
+
+### build-path (optional)
+This points to a directory in the runner. By default, it points to the default download directory of the github runner. 
+
+This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest  build artifacts into the custom image, the github workflow needs to download the artifacts prior using methods like  github action 'actions/download-artifacts@v2'. This action would then upload these artifacts to a temp azure storage account which would be accessible to the AIB service.
+
+Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
+
 ### Customizer Inputs
 
-In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be any of the types supported by Azure Image Builder service ( Shell | PowerShell | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or a present as a file(downloaded) in the GitHub runner.
-
-Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer to the Azure image and run to customize the image.
-
-Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest of build artifacts into the custom image, the github workflow needs to download the artifacts prior using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable for use by this github action. Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
+In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be an inline version for Shell or PowerShell types supported by AIB service. 
 
 #### customizer-type (optional)
-The value must be set to one of the [ Shell | PowerShell | InLine | File ].  This input is optional and defaults to null.
+The value must be set to one of the [ Shell | PowerShell].  This input is optional, if there is no customization.
 
-#### customizer-source (optional)
-This value is required only if customizer type is set to one of [ Shell | PowerShell | InLine | File ].
-If the customizer-type is Shell or PowerShell, then the value can be set either to the path in Github repor or to a publically accessible URI.  
-If the customizer-type is File, source value is set to the location of file/directory in the Github repo. 
-By default, the customizer-source value is set to default path of Github build artficats downloaded by workflow.
-If the customizer-type is Inline, you can enter inline commands separated by commas.
+#### customizer-script (optional)
+The customer can enter multi inline powershell or shell commands and use variables to point to directories inside the downloaded location.
+
 
 #### customizer-destination (optional)
-This value is required only if customizer type is declared as Shell or PowerShell or File.  The input is optional and set to a default value based on the Operating system type set in source-Os-type.
+This value is required only if customizer type is declared as Shell or PowerShell.  For Shell it will be Linux OS and for powershell it will be Windows.
 * Windows
 By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
 * Linux
