@@ -95,7 +95,7 @@ The source image type that is being used for creating the custom image and shoul
 By default, The input is optional and is set to 'PlatformImage' type.
 
 #### source-os-type: (-)
-This should be set to one of two OS types supported:  [ linux | Windows ].
+This should be set to one of two OS types supported:  [ linux | Windows ]. (TODO)
 
 #### source-image (mandatory)
 The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose from existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
@@ -116,14 +116,14 @@ The value of source-image must be set to one of the Operating systems supported 
 
 ### Customizer Inputs
 
-In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be any of the four types supported by Azure Image Builder service ( Shell | PowerShell | InLine | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or a present as a file(downloaded) in the GitHub runner.
+In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be any of the types supported by Azure Image Builder service ( Shell | PowerShell | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or a present as a file(downloaded) in the GitHub runner.
 
 Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer to the Azure image and run to customize the image.
 
-Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image by adding required customizer. To injest of build artifacts into the custom image, the github workflow needs to download the artifacts prior using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable for use by this github action. Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
+Apart from the User specified customizer, This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest of build artifacts into the custom image, the github workflow needs to download the artifacts prior using the github action actions/download-artifacts@v2. Persist the path to downloaded artifacts with an environment variable for use by this github action. Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
 
 #### customizer-type (optional)
-The value must be set to one of the [ Shell | PowerShell | InLine | File ].  This input is optional and defaults to Null.
+The value must be set to one of the [ Shell | PowerShell | InLine | File ].  This input is optional and defaults to null.
 
 #### customizer-source (optional)
 This value is required only if customizer type is set to one of [ Shell | PowerShell | InLine | File ].
