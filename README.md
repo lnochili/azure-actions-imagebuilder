@@ -129,7 +129,7 @@ This action has been designed to inject Github Build artifacts into the image by
 
 Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
 
-#### customizer-destination (optional)
+#### customizer-destination(optional)
 For Shell it will be Linux OS and for powershell it will be Windows.
 *Windows:*
 By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
@@ -226,37 +226,6 @@ If the nowait-mode is set to 'true' while running this Github action, this outpu
 
 The webhook-uri can be queried by subsequent action that can give the status of Run.  Upon completion of Image Builder run, webhook shall emit the output variables as listed above.
 
-## How it works
-When you create the release workflow with a step or job that includes this Github action, it will:
-1) Creates the Resource Group, distributor Resources and other input defaults, if does not exist already. 
-2) Creates a container in the storage account, named 'imagebuilder-githubaction', it will zip and upload your build artifacts or customizer scripts from the github Repo, and create a SAS Token on the that zip file. 
-3) Using the inputs values passed to the action or the default values defined by action, the Github action creates Builder Template resource, which will in include:
-    * Create a template prefixed 't_<ResourceGroup>_<os-type>' 10 digit monotonic integer, if the imagebuilder-template-name is not set.  
-    * Adding additional inLine customizers to move the build artifacts from default location to the customizer-destination on the image 
-4) It then runs the Image Builder process, which will perform
-    * The Image builder creates a temporary resource group with ‘'IT_<resource-group-name>_<imagebuilder-template-name>_xxxxxxxxxx' 10 digit monotonic integer. 
-    * Creates a storage account in the above temporary resource group, transfers the artifacts zip or scripts to a container named 'shell'. Saves the packerizer details and the logs into different containers in the same storage acocunt. During the image builder run, you will see this in the release logs, whilst the build is running:
-```bash
-starting run template...
-```
-5) When the image build completes you will see the following:
-```bash
-2019-05-06T12:49:52.0558229Z starting run template...
-2019-05-06T13:36:33.8863094Z run template:  Succeeded
-2019-05-06T13:36:33.8867768Z getting runOutput for  SharedImage_distribute
-2019-05-06T13:36:34.6652541Z ==============================================================================
-2019-05-06T13:36:34.6652925Z ## task output variables ##
-2019-05-06T13:36:34.6658728Z $(imageUri) =  /subscriptions/<subscriptionID>/resourceGroups/aibwinsig/providers/Microsoft.Compute/galleries/<XXsig>/images/<imagename>/versions/0.23760.13763
-2019-05-06T13:36:34.6659989Z ==============================================================================
-2019-05-06T13:36:34.6663500Z deleting template t_1557146959485...
-2019-05-06T13:36:34.6673713Z deleting storage blob imagebuilder-vststask\webapp/18-1/webapp_1557146958741.zip
-2019-05-06T13:36:34.9786039Z blob imagebuilder-vststask\webapp/18-1/webapp_1557146958741.zip is deleted
-2019-05-06T13:38:37.4884068Z delete template:  Succeeded
-```
-The image builder template resource, and ‘'IT_<DestinationResourceGroup>_<TemplateName>_XXXXXXXXX' will be deleted.
-
-6. when the Github action is run with nowait-mode set to 'false, it emits output varaibles listed below in the Outputs section upon completion of Image builder action. The $(output-image-Uri)' output variable can be used in the next task, or just take its value and build a VM.
-7. If the Github action was run with 'nowait-mode' input set to 'true', The Image builder process will be run in asynchronous mode and returns a webhook URL which can be queried to get the status of Image builder run and the output variables upon completion of the image build. 
 
 ## How to Use this Github action
 Here are few examples of how to use this Github action for Azure Image Builder with different input values.
