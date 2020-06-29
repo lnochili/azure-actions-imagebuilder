@@ -75,7 +75,7 @@ The Azure region for the new resource group created will be set to the value of 
 The name of the image builder template resource to be used for creating and running the Image builder service. 
 This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number. The unique name of image builder template will be t_<ResourceGroup>_<os-type>_xxxxxxxx" where xxxxxxx will be a 10 digit random number. 
 
-* If the input value is a path to a file name with .JSON extension, No further inputs are required for the action. The Github Action will assume the ARM template as the source for all inputs and user has ensured the values comply to standard ARM template schema for azure image builder.
+* If the input value is a path to a file name with .JSON extension. In this case, all other action inputs(except customizer) are ignored. The Github Action will assume the ARM template as the source for all inputs and user has ensured the values comply to standard ARM template schema for azure image builder.
 * If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fails if imagebuilder template already exists. Currently, update/upgrade of image builder template is not supported and it requires to create a new image builder template whenever this action needs to run.
 
 #### nowait-mode (optional)
@@ -90,7 +90,7 @@ The value is an integer which is used as timeout in minutes for running the imag
 ### Source Inputs
 #### source-image-type (optional)   
 The source image type that is being used for creating the custom image and should be set to one of three types supported:
-[ PlatformImage | SharedGalleryImage | ManagedImage ] 
+[ PlatformImage | SharedGalleryImage | ManagedImage ]  
 
 By default, The input is optional and is set to 'PlatformImage' type.
 
@@ -116,7 +116,7 @@ The value of source-image must be set to one of the Operating systems supported 
 
 ### Customizer Inputs
 
-In the Initial version of Github action,  we are supporting only one customizer which can be any of the four customizer types supported by Azure Image Builder [ Shell | PowerShell | InLine | File ]. Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or part of the github repository.  
+In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be any of the four types supported by Azure Image Builder service ( Shell | PowerShell | InLine | File ). Depending on the OS, select PowerShell | Shell customizers. The customizer scripts need to be either publicly accessible or a present as a file(downloaded) in the GitHub runner.
 
 Github action will upload the the customizer scripts from github repository to an Azure storage account for image builder to transfer to the Azure image and run to customize the image.
 
