@@ -105,10 +105,12 @@ The value of source-image must be set to one of the Operating systems supported 
     format - [ "publisher:offer:sku:version" ] if Source Image Type is PlatformImage; Example:  [ "Ubuntu:Canonical:18.04-LTS:latest" ] 
  ```
  * if the image-type is Managed Image - You need to pass in the resourceId of the source image, for example:
-```/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
+```
+/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
 ```
  * If the image-type is SharedGalleryImage - You need to pass in the resourceId of the image version for example:
-```/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
+```
+/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
 ```
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
