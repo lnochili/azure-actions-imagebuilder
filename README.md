@@ -115,16 +115,26 @@ The value of source-image must be set to one of the Operating systems supported 
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
 
-### build-path (optional)
+
+
+### Customizer Inputs
+
+In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be an inline version for Shell or PowerShell types supported by AIB service. The values mentioned by user would be converted to equivalent json syntax for AIB template.
+
+
+#### customizer-source(optional)
 This points to a directory in the runner. By default, it points to the default download directory of the github runner. 
 
 This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest  build artifacts into the custom image, the github workflow needs to download the artifacts prior using methods like  github action 'actions/download-artifacts@v2'. This action would then upload these artifacts to a temp azure storage account which would be accessible to the AIB service.
 
 Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
 
-### Customizer Inputs
-
-In the first version of Github action,  we will support only specifying only one customizer.  This customizer can be an inline version for Shell or PowerShell types supported by AIB service. 
+#### customizer-destination (optional)
+For Shell it will be Linux OS and for powershell it will be Windows.
+*Windows:*
+By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
+*Linux:*
+By default, the customer scripts or files are placed in a path relative to '/tmp' directory. however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted. So if you need these customizer scripts or files to persist in the image, you need to set customizer-destination to the absolute path where the Github action can copy the scripts or files. 
 
 #### customizer-type (optional)
 The value must be set to one of the [ Shell | PowerShell].  This input is optional, if there is no customization.
@@ -132,13 +142,6 @@ The value must be set to one of the [ Shell | PowerShell].  This input is option
 #### customizer-script (optional)
 The customer can enter multi inline powershell or shell commands and use variables to point to directories inside the downloaded location.
 
-
-#### customizer-destination (optional)
-This value is required only if customizer type is declared as Shell or PowerShell.  For Shell it will be Linux OS and for powershell it will be Windows.
-* Windows
-By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
-* Linux
-By default, the customer scripts or files are placed in a path relative to '/tmp' directory. however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted. So if you need these customizer scripts or files to persist in the image, you need to set customizer-destination to the absolute path where the Github action can copy the scripts or files. 
 
 #### customizer-windows-Update (optional) (applicable for Windows only)
 The value is boolean and set to 'false' by default. This value is for Windows images only, the image builder will run Windows Update at the end of the customizations and also handle the reboots it requires.
