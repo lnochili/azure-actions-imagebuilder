@@ -108,8 +108,7 @@ The value of source-image must be set to one of the Operating systems supported 
 ```/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
 ```
  * If the image-type is SharedGalleryImage - You need to pass in the resourceId of the image version for example:
-```
-/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
+```/subscriptions/$subscriptionID/resourceGroups/$sigResourceGroup/providers/Microsoft.Compute/galleries/$sigName/images/$imageDefName/versions/<versionNumber> 
 ```
 * Note: For Azure Marketplace Base Images, Image Builder defaults to use the 'latest' version of the supported OS's
 
