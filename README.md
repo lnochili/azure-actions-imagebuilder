@@ -207,7 +207,7 @@ This input value is optional and Github action applies default tags even if cust
  image-os: $source-os-type
  image-type: $image-type
 ```
-
+[TODO] add github tags for traceability.
 
 ### Action Outputs:
 This Github action emits a set  of outputs the following outputs are set by the IB Action so that it can be used by the subsequent actions 
