@@ -9,7 +9,8 @@ This actions aims at making it easier for customers to get started with the firs
 ### Prerequisites
 * You must have access to a Github account or project, in which you have permissions to create a Github workflow 
 * You must have an Azure Subscription with contributor permission to Azure Resource Groups of the source image and distributor images  
-* Register and enable Azure features, as per below:
+
+#### Register and enable Azure features, as per below:
 
 ```bash
 az feature register --namespace Microsoft.VirtualMachineImages --name VirtualMachineTemplatePreview
