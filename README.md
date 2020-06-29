@@ -79,7 +79,7 @@ This input is optional and by default, Action will use a unique name formed usin
 * If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fails if imagebuilder template already exists. Currently, update/upgrade of image builder template is not supported and it requires to create a new image builder template whenever this action needs to run.
 
 #### nowait-mode (optional)
-The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'.
+The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'. In future this can be expanded to use webhooks to trigger another workflow when the image building is complete in AIB service
   
 #### build-timeout-in-minutes (optional)
 The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
