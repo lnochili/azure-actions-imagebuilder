@@ -84,7 +84,7 @@ The value is boolean which is used to determine whether to run the Image builder
 #### build-timeout-in-minutes (optional)
 The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
 
-#### vm-profile ( Optional Settings)
+#### vm-profile ( Optional )
 * [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC.
 
 ### Source Inputs
@@ -95,7 +95,7 @@ The source image type that is being used for creating the custom image and shoul
 By default, The input is optional and is set to 'PlatformImage' type.
 
 #### source-os-type: (-)
-This should be set to one of three OS types supported:  [ linux | Windows ]
+This should be set to one of two OS types supported:  [ linux | Windows ].
 
 #### source-image (mandatory)
 The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose from existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
