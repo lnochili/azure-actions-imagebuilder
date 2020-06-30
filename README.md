@@ -172,7 +172,7 @@ By default, the value for distributor-type is set to ManagedImage.
 
    The Image Gallery and the Image Definition must already exist and the ResourceID provided is an existing Azure Resource. Eg: 
    
-    ```bash
+    ```
     dist-resource-id: /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>
      
     dist-location: westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
@@ -182,14 +182,14 @@ By default, the value for distributor-type is set to ManagedImage.
 [TODO] Can we do away with this by setting a default image name (mi_ which will be unique in the Azure region set in dist-location.  
 
 The value of dist-resource-id needs to be set as given below:
-    ```bash
+
+    ```
     dist-resource-id: /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
    
     dist-location: westus2  #set to one of the Azure region to which the Managed image needs to be distributed. 
     ```   
-* Azure Shared Image Gallery ResourceID: 
 
-   
+
 * For distributor type VHD:
     * You cannot pass any values to this, Image Builder will create the VHD and the Github action will emit the resource id of VHD as output variable. 
 
