@@ -94,8 +94,8 @@ The source image type that is being used for creating the custom image and shoul
 
 By default, The input is optional and is set to 'PlatformImage' type.
 
-#### source-os-type: (-)
-This should be set to one of two OS types supported:  [ linux | Windows ]. (TODO)
+#### source-os-type: (mandatory)
+This should be set to one of two OS types supported:  [ linux | Windows ]. This information will also be used in the customization section to determine the default directory for dowloaded artifacts.
 
 #### source-image (mandatory)
 The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose from existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
@@ -123,17 +123,17 @@ In the first version of Github action,  we will support only specifying only one
 
 
 #### customizer-source(optional)
-This points to a directory in the runner. By default, it points to the default download directory of the github runner. 
+This takes the path to a directory or a file in the runner. By default, it points to the default download directory of the github runner. 
 
-This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest  build artifacts into the custom image, the github workflow needs to download the artifacts prior using methods like  github action 'actions/download-artifacts@v2'. This action would then upload these artifacts to a temp azure storage account which would be accessible to the AIB service.
+This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest  build artifacts into the custom image, the github workflow is assumed to have downloaded necessary artifacts using methods like  github action 'actions/download-artifacts@v2'. This action would then upload these artifacts to a temp azure storage account which would be accessible to the AIB service.
 
 Please note that this Github action adds the build artifacts customizer as the fist one in the list of customizers so that the build artifacts are made available for the user defined customizer to perform additional customizations.
 
 #### customizer-destination(optional)
-For Shell it will be Linux OS and for powershell it will be Windows.
-*Windows:*
+The default path of customizer-destination would depend on the OS defined in 'source-os-type' field.
+##### *Windows:*
 By default, The customizer scripts or Files are placed in a path relative to C:\. This value needs to be set to the path, if the path is other than C:\.
-*Linux:*
+##### *Linux:*
 By default, the customer scripts or files are placed in a path relative to '/tmp' directory. however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted. So if you need these customizer scripts or files to persist in the image, you need to set customizer-destination to the absolute path where the Github action can copy the scripts or files. 
 
 #### customizer-type (optional)
