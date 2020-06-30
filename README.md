@@ -177,7 +177,7 @@ The value of dist-resource-id needs to be set as given below:
     ```bash
     /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
    
-    dist-location - westus2  #set to one of the Azure region to which the Managed image needs to be distributed. 
+    dist-location: westus2  #set to one of the Azure region to which the Managed image needs to be distributed. 
     ```   
 * Azure Shared Image Gallery ResourceID: 
    The Image Gallery and the Image Definition must already exist and the ResourceID provided is an existing Azure Resource.
@@ -185,7 +185,7 @@ The value of dist-resource-id needs to be set as given below:
     ```bash
     /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>
      
-     dist-location - westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
+     dist-location: westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
      ```
    
 * VHD
