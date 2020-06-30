@@ -95,7 +95,7 @@ The source image type that is being used for creating the custom image and shoul
 By default, The input is optional and is set to 'PlatformImage' type.
 
 #### source-os-type: (mandatory)
-This should be set to one of two OS types supported:  [ linux | Windows ]. This information will also be used in the customization section to determine the default directory for dowloaded artifacts.
+This should be set to one of two OS types supported:  [ linux | windows ]. This information will also be used in the customization section to determine the default directory for dowloaded artifacts.
 
 #### source-image (mandatory)
 The value of source-image must be set to one of the Operating systems supported by Azure Image Builder. Apart from the Platform images from Azure Market place, You can choose from existing custom images that are Managed Images or image versions in Shared Image Gallery. This source-image value is mandatory and source image should be present in the Azure region set in the input value of 'location'.
