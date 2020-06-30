@@ -178,7 +178,7 @@ By default, the value for distributor-type is set to ManagedImage.
     dist-location: westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
      ```
 
-* For ManagedImage, dist-resource-id is mandatory and is used to create the Managed image resource with the specified imageName. By  default, the image will be created in the same Azure region as the template. 
+* For distributor type  ManagedImage, dist-resource-id is mandatory and is used to create the Managed image resource with the specified imageName. By  default, the image will be created in the same Azure region as the template. 
 [TODO] Can we do away with this by setting a default image name (mi_ which will be unique in the Azure region set in dist-location.  
 
 The value of dist-resource-id needs to be set as given below:
