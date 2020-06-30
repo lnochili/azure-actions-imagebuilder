@@ -136,9 +136,6 @@ By default, The customizer scripts or Files are placed in a path relative to C:\
 ##### *Linux:*
 By default, the customer scripts or files are placed in a path relative to '/tmp' directory. however, on many Linux OS's, on a reboot, the /tmp directory contents are deleted. So if you need these customizer scripts or files to persist in the image, you need to set customizer-destination to the absolute path where the Github action can copy the scripts or files. 
 
-#### customizer-type (optional)
-The value must be set to one of the [ Shell | PowerShell].  This input is optional, if there is no customization.
-
 #### customizer-script (optional)
 The customer can enter multi inline powershell or shell commands and use variables to point to directories inside the downloaded location.
 
