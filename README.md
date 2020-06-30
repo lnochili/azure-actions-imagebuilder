@@ -168,27 +168,29 @@ The distributor-type determines the format in which the image is to be distribut
 By default, the value for distributor-type is set to ManagedImage.
 
 #### dist-resource-id & dist-location: (optional)
-* Both these values are mandatory if the distributor type is SharedGalleryImage. The dist-resource-id is used to create an image version under the image definition in Azure regions listed in dist-location.
+* For distributor type SharedGalleryImage, both these values are mandatory. The dist-resource-id is used to create an image version under the image definition in Azure regions listed in dist-location.
 
-* For ManagedImage, dist-resource-id is used to create the Managed image resource with the imageName and the image will be created in the Azure region set in dist-location. If no value is provided, The value of dist-resource-id is set to a default image name (mi_ which will be unique in the Azure region set in dist-location.  
+   The Image Gallery and the Image Definition must already exist and the ResourceID provided is an existing Azure Resource. Eg: 
+   
+    ```bash
+    dist-resource-id: /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>
+     
+    dist-location: westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
+     ```
+
+* For ManagedImage, dist-resource-id is mandatory and is used to create the Managed image resource with the specified imageName. By  default, the image will be created in the same Azure region as the template. 
+[TODO] Can we do away with this by setting a default image name (mi_ which will be unique in the Azure region set in dist-location.  
 
 The value of dist-resource-id needs to be set as given below:
-* Managed Image ResourceID:
     ```bash
-    /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
+    dist-resource-id: /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/images/<imageName>
    
     dist-location: westus2  #set to one of the Azure region to which the Managed image needs to be distributed. 
     ```   
 * Azure Shared Image Gallery ResourceID: 
-   The Image Gallery and the Image Definition must already exist and the ResourceID provided is an existing Azure Resource.
+
    
-    ```bash
-    /subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Compute/galleries/<galleryName>/images/<imageDefName>
-     
-     dist-location: westus2, westcentralus  #set to one or more  Azure regions to which the image needs to be distributed/replicated.
-     ```
-   
-* VHD
+* For distributor type VHD:
     * You cannot pass any values to this, Image Builder will create the VHD and the Github action will emit the resource id of VHD as output variable. 
 
 #### run-output-name: (optional)
@@ -221,7 +223,7 @@ Upon successful completion, The github action emits the URI or resource id of th
 #### webhook-uri: 
 If the nowait-mode is set to 'true' while running this Github action, this output variable will be set to the webhook URI.
 
-The webhook-uri can be queried by subsequent action that can give the status of Run.  Upon completion of Image Builder run, webhook shall emit the output variables as listed above.
+The webhook-uri can be queried by subsequent action that can give the status of Run.  Upon completion of Image Builder run, webhook shall emit the output variables as listed above. 
 
 
 ## How to Use this Github action
