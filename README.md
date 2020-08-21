@@ -123,7 +123,7 @@ In the first version of Github action,  we will support only specifying only one
 
 
 #### customizer-source(optional)
-This takes the path to a directory or a file in the runner. By default, it points to the default download directory of the github runner. 
+This takes the path to a directory or a file in the runner. By default, it points to a folder in the default download directory of the github runner: $(GITHUB_WORKSPACE)/imageArtifacts/. 
 
 This action has been designed to inject Github Build artifacts into the image by adding required customizer. To ingest  build artifacts into the custom image, the github workflow is assumed to have downloaded necessary artifacts using methods like  github action 'actions/download-artifacts@v2'. This action would then upload these artifacts to a temp azure storage account which would be accessible to the AIB service.
 
