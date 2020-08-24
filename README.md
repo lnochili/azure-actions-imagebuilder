@@ -66,20 +66,22 @@ The action begins now!!!
 This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. If the location is not from [supported regions](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-overview#regions), then action should throw error. 
 so for example, if you are using Shared Gallery Image or Managed Image as source image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image.  
 
-#### managed-identity(mandatory)
-Image Builder will use the user-identity provided to inject the image into the resource group. More details on this [here](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/image-builder#create-a-user-assigned-identity-and-set-permissions-on-the-resource-group). This takes the full identifier of the managed identity: `/subscriptions/xxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx/resourceGroups/raivmdemo-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rai-identity-aib`
-
-#### resource-group-name (optional)
-This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
-The new Resource Group created will be unique which will be of the form : "rg_aib_action_XXXXXX" where xxxxx is a 5 digit random number. Note that RG should be the same RG as the provided managed-identity.
-The Azure region for the new resource group created will be set to the value of input variable 'location'. 
-
 #### imagebuilder-template-name (optional)
 The name of the image builder template resource to be used for creating and running the Image builder service. 
 This input is optional and by default, Action will use a unique name formed using a combination of resource-group-name and Github workflow Run number. The unique name of image builder template will be t_<ResourceGroup>_<os-type>_xxxxxxxx" where xxxxxxx will be a 10 digit random number. 
 
 * If the input value is a path to a file name with .JSON extension. In this case, all other action inputs(except customizer) are ignored. The Github Action will assume the ARM template as the source for all inputs and user has ensured the values comply to standard ARM template schema for azure image builder.
 * If the input value is a simple string without .JSON, it is used to create new Image builder template in Azure resource Group. The action will check and fails if imagebuilder template already exists. Currently, update/upgrade of image builder template is not supported and it requires to create a new image builder template whenever this action needs to run.
+
+#### managed-identity(optional)
+Image Builder will use the user-identity provided to inject the image into the resource group. More details on this [here](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/image-builder#create-a-user-assigned-identity-and-set-permissions-on-the-resource-group). This takes the full identifier of the managed identity: `/subscriptions/xxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx/resourceGroups/raivmdemo-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rai-identity-aib` . Note that this is the identity field in template json([example](https://github.com/danielsollondon/azvmimagebuilder/blob/master/quickquickstarts/0_Creating_a_Custom_Windows_Managed_Image/helloImageTemplateWin01.json)). Not needed if users is providing a json template.
+
+#### resource-group-name (optional)
+This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
+The new Resource Group created will be unique which will be of the form : "rg_aib_action_XXXXXX" where xxxxx is a 5 digit random number. Note that RG should be the same RG as the provided managed-identity.
+The Azure region for the new resource group created will be set to the value of input variable 'location'. 
+
+
 
 #### nowait-mode (optional)
 [future] The value is boolean which is used to determine whether to run the Image builder action in Asynchrnous mode or not.  The input is optional and by default it is set to 'false'. In future this can be expanded to use webhooks to trigger another workflow when the image building is complete in AIB service
