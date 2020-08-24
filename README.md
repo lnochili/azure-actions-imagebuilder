@@ -67,7 +67,7 @@ This is the Azure region in which the Image Builder will run and this is also th
 so for example, if you are using Shared Gallery Image or Managed Image as source image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image.  
 
 #### managed-identity(mandatory)
-Image Builder will use the user-identity provided to inject the image into the resource group. More details on this [here](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/image-builder#create-a-user-assigned-identity-and-set-permissions-on-the-resource-group). This takes the full identifier of the managed identity: /subscriptions/xxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx/resourceGroups/raivmdemo-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rai-identity-aib
+Image Builder will use the user-identity provided to inject the image into the resource group. More details on this [here](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/image-builder#create-a-user-assigned-identity-and-set-permissions-on-the-resource-group). This takes the full identifier of the managed identity: `/subscriptions/xxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx/resourceGroups/raivmdemo-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rai-identity-aib`
 
 #### resource-group-name (optional)
 This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
