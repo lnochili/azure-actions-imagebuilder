@@ -87,8 +87,8 @@ This input is optional and by default, Action will use a unique name formed usin
 #### build-timeout-in-minutes (optional)
 The value is an integer which is used as timeout in minutes for running the image build and the input is optional.  By default the timeout value is set to 80 minutes, if the input value is not provided.
 
-#### vm-profile ( Optional )
-* [VM Size](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile) - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC.
+#### vm-size ( Optional )
+* VM Size - You can override the VM size, from the default value i.e. *Standard_D1_v2*. You may set to a different VM size to reduce total customization time, or to use specific VM sizes, such as GPU / HPC. More details [here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-json#vmprofile)
 
 ### Source Inputs
 #### source-image-type (optional)   
