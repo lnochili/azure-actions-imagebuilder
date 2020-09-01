@@ -62,7 +62,13 @@ The action begins now!!!
 ### Action Inputs
 ### General Inputs 
  
-#### location (mandatory)
+#### resource-group-name (mandatory)
+This is the Resource Group where the temporary Imagebuilder Template resource will be created. This input is optional if the Login user/spn configured in Github Secrects has permissions to create new Resrouce Group.  The Action will create a new Resource Group to create and run the Image Builder resource.
+The new Resource Group created will be unique which will be of the form : "rg_aib_action_XXXXXX" where xxxxx is a 5 digit random number. Note that RG should be the same RG as the provided managed-identity.
+The Azure region for the new resource group created will be set to the value of input variable 'location'. 
+
+
+#### location (optional)
 This is the Azure region in which the Image Builder will run and this is also the region where the source image is present.  Currently, there are only limited Azure regions where Azure Image builder service is available. Hence, The source image must be present in this location along with the Image builder service. If the location is not from [supported regions](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/image-builder-overview#regions), then action should throw error. 
 so for example, if you are using Shared Gallery Image or Managed Image as source image, the image must exist in this Azure region.  This value is mandatory so that the image building process shall run in the same region as the source image.  
 
